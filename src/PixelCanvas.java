@@ -1,7 +1,7 @@
 import javax.swing.JFrame;
 import javax.swing.event.MouseInputListener;
 
-import java.awt.Color;
+ import java.awt.Color;
 //import java.awt.event.MouseListener;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
@@ -14,6 +14,8 @@ public class PixelCanvas extends JFrame implements MouseInputListener {
     private int pixel_size;
     private Dimension canvas_size;
     private static Pixel[][] pixels;
+    private int old_pixel_x = -1;
+    private int old_pixel_y = -1;
 
     PixelCanvas(int width, int height) {
         super("Pixel Canvas");
@@ -24,6 +26,7 @@ public class PixelCanvas extends JFrame implements MouseInputListener {
         // setForeground(Color.BLACK);
         setVisible(true);
         addMouseListener(this);
+        addMouseMotionListener(this);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pixel_size = calcpixel_size();
         initPixels();
@@ -78,7 +81,7 @@ public class PixelCanvas extends JFrame implements MouseInputListener {
         pixel_size = calcpixel_size(d);
     }
 
-    private int normalize_x(int x) {
+    private int normalize_x(int x) throws IndexOutOfBoundsException{
         int norm_x = x / pixel_size;
         if (norm_x >= canvas_size.width) {
             throw new IndexOutOfBoundsException("x out of bounds");
@@ -86,7 +89,7 @@ public class PixelCanvas extends JFrame implements MouseInputListener {
         return norm_x;
     }
 
-    private int normalize_y(int y) {
+    private int normalize_y(int y) throws IndexOutOfBoundsException{
         int norm_y = y / pixel_size;
         if (norm_y >= canvas_size.height) {
             throw new IndexOutOfBoundsException("y out of bounds");
@@ -167,11 +170,35 @@ public class PixelCanvas extends JFrame implements MouseInputListener {
 
     public void mouseMoved(MouseEvent e) {
         System.out.println("Mouse moved");
-        System.out.println("x: " + e.getX());
+        try {
+            int pixel_x = normalize_x(e.getX());
+            int pixel_y = normalize_y(e.getY());
+
+            Graphics g = getGraphics();
+            System.out.println("pixel_x: " + pixel_x + ", pixel_y: " + pixel_y);
+            System.out.println("old_pixel_x: " + old_pixel_x + ", old_pixel_y: " + old_pixel_y);
+            if ((pixel_x != old_pixel_x || pixel_y != old_pixel_y) && (old_pixel_x != -1 && old_pixel_y != -1)) {
+                Pixel old_pixel = getPixel(old_pixel_x, old_pixel_y);
+                g.setColor(old_pixel.color);
+                g.fillRect(old_pixel.getX() * pixel_size, old_pixel.getY() * pixel_size, pixel_size, pixel_size);
+                g.setColor(Color.RED);
+                g.fillRect(pixel_x * pixel_size, pixel_y * pixel_size, pixel_size, pixel_size);
+                g.dispose();
+            }
+            old_pixel_x = pixel_x;
+            old_pixel_y = pixel_y;
+        } catch (IndexOutOfBoundsException ex) {
+            return;
+        }
     }
 
     public static void main(String[] args) throws Exception {
         PixelCanvas canvas = new PixelCanvas(4, 4);
+        //canvas.add(new ColorPicker(), BorderLayout.EAST);
+        //System.out.println(canvas.getComponent(0));
+        //JColorChooser choos = new JColorChooser();
+        //canvas.add(choos, BorderLayout.PAGE_END);
+        //System.out.println("AAA" +choos.getColor().toString());
     }
 
     public class Pixel {
