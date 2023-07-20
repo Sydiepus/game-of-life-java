@@ -1,3 +1,4 @@
+package etsuko;
 import java.util.Random;
 
 import javax.swing.JComponent;
