@@ -1,21 +1,43 @@
 package etsuko;
 
-import java.util.Scanner;
+import javax.swing.JFrame;
+import java.awt.BorderLayout;
 
 public class Main {
+
     public static void main(String[] args) {
-        PixelCanvas canvas = new PixelCanvas(50, 50);
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Edit the canvas and press enter to start the game");
-        scanner.nextLine();
-        GameOfLife game = new GameOfLife(canvas);
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 500);
+        frame.setTitle("Game of life");
+        frame.setVisible(true);
+        PixelPanel canvas = new PixelPanel(40, 40);
+        GameOfLifeUI cp = new GameOfLifeUI(canvas);
+        frame.add(cp, BorderLayout.WEST);
+        frame.add(canvas, BorderLayout.CENTER);
+        GameOfLife game = null;
+        Boolean firstCall = true;
         while (true) {
-            canvas.removeMouseListener(canvas);
-            canvas.removeMouseMotionListener(canvas);
-            game.apllyRules();
-            canvas.repaint();
+            if (cp.isRunning()) {
+                if (game == null) {
+                    game = new GameOfLife(canvas);
+                }
+                if (firstCall) {
+                    canvas.removeMouseListener(canvas);
+                    canvas.removeMouseMotionListener(canvas);
+                    firstCall = false;
+                }
+                game.apllyRules();
+                canvas.repaint();
+            } else {
+                if (!firstCall) {
+                    canvas.addMouseListener(canvas);
+                    canvas.addMouseMotionListener(canvas);
+                    firstCall = true;
+                }
+            }
             try {
-                Thread.sleep(200);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

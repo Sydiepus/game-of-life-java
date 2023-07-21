@@ -1,18 +1,15 @@
 package etsuko;
 
-import java.awt.Color;
-import etsuko.Pixel;
-import etsuko.PixelCanvas;
 import java.util.ArrayList;
 
 public class GameOfLife {
     private ArrayList<Pixel> alive_cells;
-    private PixelCanvas canvas;
+    private PixelPanel canvas;
     private int Iteration = 0;
     private static int canvas_width;
     private static int canvas_height;
 
-    GameOfLife(PixelCanvas canvas) {
+    GameOfLife(PixelPanel canvas) {
         this.canvas = canvas;
         canvas_width = canvas.getCanvasSize().width;
         canvas_height = canvas.getCanvasSize().height;
@@ -24,7 +21,7 @@ public class GameOfLife {
         for (int x = 0; x < canvas_width; x++) {
             for (int y = 0; y < canvas_height; y++) {
                 Pixel pixel = canvas.getPixel(x, y);
-                if (pixel.getColor() != canvas.getBackground()) {
+                if (pixel.getColor() != canvas.getBack()) {
                     alive_cells.add(pixel);
                 }
             }
@@ -50,13 +47,13 @@ public class GameOfLife {
                     // Any live cell with more than three live neighbours dies, as if by
                     // overpopulation.
                     else {
-                        cell.setColor(canvas.getBackground());
+                        cell.setColor(canvas.getBack());
                     }
                 } else {
                     // Any dead cell with exactly three live neighbours becomes a live cell, as if
                     // by reproduction.
                     if (alive_neighbours == 3) {
-                        cell.setColor(Color.WHITE);
+                        cell.setColor(canvas.getSelectedColor());
                         new_alive_cells.add(cell);
 
                     }
