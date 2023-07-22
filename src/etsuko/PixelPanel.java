@@ -17,14 +17,16 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     private static Pixel[][] pixels;
     private Color back = Color.BLACK;
     private Color selected_color = Color.WHITE;
-    private int old_pixel_x = -1;
-    private int old_pixel_y = -1;
+    private static int old_pixel_x = 0;
+    private static int old_pixel_y = 0;
+    private static Pixel old_pixel = null;
 
     PixelPanel(int width, int height) {
         super();
         pixels = new Pixel[width][height];
         canvas_size = new Dimension(width, height);
         initPixels();
+        old_pixel = pixels[0][0];
         setMinimumSize(new Dimension(width * 10, height * 10));
         setMaximumSize(new Dimension(width * 10, height * 10));
         setPreferredSize(new Dimension(width * 10, height * 10));
@@ -56,17 +58,14 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         }
     }
 
-    //@Override
     public void setBack(Color color) {
         if ((back != null) && !back.equals(color)) {
             changeColor(color, back);
             back = color;
-            //super.setBackground(color);
             repaint();
         }
     }
 
-    //@Override
     public Color getBack() {
         return back;
     }
@@ -92,18 +91,18 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         return canvas_size;
     }
 
-    private int normalize_x(int x) throws IndexOutOfBoundsException {
+    private int normalize_x(int x) throws OutOfBoundsException {
         int norm_x = x / pixel_size;
         if (norm_x >= canvas_size.width) {
-            throw new IndexOutOfBoundsException("x out of bounds");
+            throw new OutOfBoundsException("x out of bounds");
         }
         return norm_x;
     }
 
-    private int normalize_y(int y) throws IndexOutOfBoundsException {
+    private int normalize_y(int y) throws OutOfBoundsException {
         int norm_y = y / pixel_size;
         if (norm_y >= canvas_size.height) {
-            throw new IndexOutOfBoundsException("y out of bounds");
+            throw new OutOfBoundsException("y out of bounds");
         }
         return norm_y;
     }
@@ -148,7 +147,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
             g.setColor(selected_color);
             g.fillRect(pixel_x * pixel_size, pixel_y * pixel_size, pixel_size, pixel_size);
             // addPixel(pixel);
-        } catch (IndexOutOfBoundsException e) {
+        } catch (OutOfBoundsException e) {
             return;
         }
         g.dispose();
@@ -198,6 +197,8 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     @Override
     public void mouseExited(java.awt.event.MouseEvent e) {
         System.out.println("mouseExited");
+        old_pixel = getPixel(old_pixel_x, old_pixel_y);
+        repaintOldPixel();
     }
 
     public void mouseDragged(MouseEvent e) {
@@ -209,22 +210,46 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         try {
             int pixel_x = normalize_x(e.getX());
             int pixel_y = normalize_y(e.getY());
-
             Graphics g = getGraphics();
             System.out.println("pixel_x: " + pixel_x + ", pixel_y: " + pixel_y);
             System.out.println("old_pixel_x: " + old_pixel_x + ", old_pixel_y: " + old_pixel_y);
             if ((pixel_x != old_pixel_x || pixel_y != old_pixel_y) && (old_pixel_x != -1 && old_pixel_y != -1)) {
-                Pixel old_pixel = getPixel(old_pixel_x, old_pixel_y);
+                old_pixel = getPixel(old_pixel_x, old_pixel_y);
                 g.setColor(old_pixel.getColor());
                 g.fillRect(old_pixel.getX() * pixel_size, old_pixel.getY() * pixel_size, pixel_size, pixel_size);
                 g.setColor(selected_color);
                 g.fillRect(pixel_x * pixel_size, pixel_y * pixel_size, pixel_size, pixel_size);
                 g.dispose();
+                old_pixel_x = pixel_x;
+                old_pixel_y = pixel_y;
+            } else if ((old_pixel_x == pixel_x && old_pixel_y == pixel_y)
+                    && (old_pixel = getPixel(old_pixel_x, old_pixel_y)).getColor().equals(back)) {
+                repaintOldPixel(g, selected_color);
+                g.dispose();
+
             }
-            old_pixel_x = pixel_x;
-            old_pixel_y = pixel_y;
-        } catch (IndexOutOfBoundsException ex) {
+        } catch (OutOfBoundsException ex) {
+            old_pixel = getPixel(old_pixel_x, old_pixel_y);
+            repaintOldPixel();
             return;
+        }
+    }
+
+    public void repaintOldPixel(Graphics g, Color color) {
+        g.setColor(color);
+        g.fillRect(old_pixel.getX() * pixel_size, old_pixel.getY() * pixel_size, pixel_size, pixel_size);
+
+    }
+
+    public void repaintOldPixel() {
+        Graphics g = getGraphics();
+        repaintOldPixel(g, old_pixel.getColor());
+        g.dispose();
+    }
+
+    class OutOfBoundsException extends Exception {
+        public OutOfBoundsException(String error) {
+            super(error);
         }
     }
 
