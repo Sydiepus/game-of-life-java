@@ -1,12 +1,9 @@
 package etsuko;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.event.MouseInputListener;
 
 import java.awt.Color;
-import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.Dimension;
@@ -30,13 +27,10 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         setMinimumSize(new Dimension(width * 10, height * 10));
         setMaximumSize(new Dimension(width * 10, height * 10));
         setPreferredSize(new Dimension(width * 10, height * 10));
-
-        // setForeground(Color.BLACK);
-        // setLayout(new GridLayout(width, height));
         setVisible(true);
         addMouseListener(this);
         addMouseMotionListener(this);
-        pixel_size = calcpixel_size();
+        pixel_size = calculatePixelSize();
     }
 
     private void initPixels() {
@@ -72,13 +66,11 @@ public class PixelPanel extends JPanel implements MouseInputListener {
 
     @Override
     public void paint(Graphics g) {
-        pixel_size = calcpixel_size();
+        pixel_size = calculatePixelSize();
         // Clear the frame.
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());
-        // g.clearRect(0, 0, getWidth(), getHeight());
         // Draw the pixels.
-        System.out.println("pxels: " + pixels.toString());
         for (int x = 0; x < canvas_size.width; x++) {
             for (int y = 0; y < canvas_size.height; y++) {
                 drawPixel(pixels[x][y], g);
@@ -93,7 +85,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
 
     private int normalize_x(int x) throws OutOfBoundsException {
         int norm_x = x / pixel_size;
-        if (norm_x >= canvas_size.width) {
+        if (norm_x >= canvas_size.width || norm_x < 0) {
             throw new OutOfBoundsException("x out of bounds");
         }
         return norm_x;
@@ -101,35 +93,18 @@ public class PixelPanel extends JPanel implements MouseInputListener {
 
     private int normalize_y(int y) throws OutOfBoundsException {
         int norm_y = y / pixel_size;
-        if (norm_y >= canvas_size.height) {
+        if (norm_y >= canvas_size.height || norm_y < 0) {
             throw new OutOfBoundsException("y out of bounds");
         }
         return norm_y;
     }
 
     public Pixel getPixel(int x, int y) {
-        // The canvas is split into a grid of pixels
-        // each pixel has a size of pixel_size
-        // This function returns the pixel number of the pixel at (x, y)
-        // (x, y) is the coordinate of the mouse click
-        // we need to check which pixel contains the mouse click
-        // The pixel is square, so we can check if the mouse click is within the
-        // boundaries of the pixel.
         return pixels[x][y];
     }
 
     public void addPixel(Pixel pixel) {
-        // if (pixels.size() <= pixel.getX()) {
-        // pixels.add(new ArrayList<Pixel>());
-        // pixels.get(pixel.getX()).add(pixel);
-        // } else if (pixels.get(pixel.getX()).size() <= pixel.getY()) {
-        // pixels.get(pixel.getX()).add(pixel);
-        // } else {
-        // pixels.get(pixel.getX()).set(pixel.getY(), pixel);
-        // }
         pixels[pixel.getX()][pixel.getY()] = pixel;
-        // pixels[pixel.getX()][pixel.getY()] = pixel;
-        // System.out.println("pixels: " + pixels.toString());
     }
 
     public Pixel[][] getPixels() {
@@ -141,12 +116,10 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         try {
             int pixel_x = normalize_x(x);
             int pixel_y = normalize_y(y);
-            Pixel pixel = getPixel(pixel_x, pixel_y);// new Pixel(pixel_x, pixel_y, selected_color);// new
-                                                     // Color(r.nextInt()));
+            Pixel pixel = getPixel(pixel_x, pixel_y);
             pixel.setColor(selected_color);
             g.setColor(selected_color);
             g.fillRect(pixel_x * pixel_size, pixel_y * pixel_size, pixel_size, pixel_size);
-            // addPixel(pixel);
         } catch (OutOfBoundsException e) {
             return;
         }
@@ -158,7 +131,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         g.fillRect(pixel.getX() * pixel_size, pixel.getY() * pixel_size, pixel_size, pixel_size);
     }
 
-    private int calcpixel_size() {
+    private int calculatePixelSize() {
         return Math.min(getWidth(), getHeight()) / Math.min(canvas_size.width, canvas_size.height);
     }
 
@@ -174,45 +147,38 @@ public class PixelPanel extends JPanel implements MouseInputListener {
 
     @Override
     public void mouseClicked(java.awt.event.MouseEvent e) {
-        System.out.println("mouseClicked");
         drawPixel(e.getX(), e.getY());
 
     }
 
     @Override
     public void mousePressed(java.awt.event.MouseEvent e) {
-        System.out.println("mousePressed");
     }
 
     @Override
     public void mouseReleased(java.awt.event.MouseEvent e) {
-        System.out.println("mouseReleased");
     }
 
     @Override
     public void mouseEntered(java.awt.event.MouseEvent e) {
-        System.out.println("mouseEntered");
     }
 
     @Override
     public void mouseExited(java.awt.event.MouseEvent e) {
-        System.out.println("mouseExited");
         old_pixel = getPixel(old_pixel_x, old_pixel_y);
         repaintOldPixel();
     }
 
     public void mouseDragged(MouseEvent e) {
-        System.out.println("Mouse dragged");
+        drawPixel(e.getX(), e.getY());
+
     }
 
     public void mouseMoved(MouseEvent e) {
-        System.out.println("Mouse moved");
         try {
             int pixel_x = normalize_x(e.getX());
             int pixel_y = normalize_y(e.getY());
             Graphics g = getGraphics();
-            System.out.println("pixel_x: " + pixel_x + ", pixel_y: " + pixel_y);
-            System.out.println("old_pixel_x: " + old_pixel_x + ", old_pixel_y: " + old_pixel_y);
             if ((pixel_x != old_pixel_x || pixel_y != old_pixel_y) && (old_pixel_x != -1 && old_pixel_y != -1)) {
                 old_pixel = getPixel(old_pixel_x, old_pixel_y);
                 repaintOldPixel(g);
@@ -254,46 +220,5 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         public OutOfBoundsException(String error) {
             super(error);
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        JFrame frame = new JFrame("Pixelpanel");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
-        frame.setLayout(new BorderLayout());
-        frame.setVisible(true);
-        PixelPanel panel = new PixelPanel(4, 4);
-        frame.add(panel, BorderLayout.CENTER);
-        GameOfLifeUI cp = new GameOfLifeUI(panel);
-        frame.add(cp, BorderLayout.WEST);
-        System.out.println(UIManager.getColor("Panel.background"));
-        // JColorChooser cp = new JColorChooser();
-        // cp.addPropertyChangeListener(new PropertyChangeListener() {
-        // @Override
-        // public void Pro
-        // });
-        // frame.add(cp, BorderLayout.WEST);
-        // System.out.println(cp.getSelectionModel().toString());
-        // frame.add(new JButton("asdasdaAA"), BorderLayout.EAST);
-        // Button to add color.
-        // it's another button added to the pallet, when clicked it updates the
-        // selected_color var that is used to highlight and paint pixels.
-        // Action listener for button.
-
-        // Pixelpanel color_picker = new Pixelpanel(6, 1);
-        // frame.add(color_picker);
-        // panel.add(panel.new Pixel(0, 0, new Color(r.nextInt())));
-        // panel.add(panel.new Pixel(0, 1, new Color(r.nextInt())));
-
-        // panel.setSize(500, 500);
-        // panel.setLocation(0, 0);
-
-        // for (int i = 0; i < 100; i++) {
-        // pixels.add(new ArrayList<Pixel>());
-        // for (int j = 0; j < 100; j++) {
-        // pixels.get(i).add(panel.new Pixel(i, j, new Color(r.nextInt())));
-        // panel.add(pixels.get(i).get(j));
-        // }
-        // }
     }
 }
