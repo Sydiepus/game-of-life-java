@@ -8,7 +8,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 
 import java.awt.Color;
-//import java.awt.event.MouseListener;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,13 +29,9 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 this.canvas = canvas;
                 setSize(100, 150);
                 setMaximumSize(new Dimension(100, 150));
-                // setBackground(Color.BLACK);
                 GroupLayout layout = new GroupLayout(this);
                 setLayout(layout);
                 setVisible(true);
-                // addMouseListener(this);
-                // addMouseMotionListener(this);
-                // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 alive_color_label = new JLabel("Alive color : ");
                 alive_color_picker = new JButton();
                 alive_color_picker.setToolTipText("Alive cells");
@@ -54,7 +49,6 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 allowEdits.addItemListener(new ItemListener() {
                         public void itemStateChanged(ItemEvent e) {
                                 editable = !editable;
-                                System.out.println(editable);
                         }
                 });
                 JButton startButton = new JButton("Start");
@@ -63,9 +57,6 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                         public void actionPerformed(ActionEvent e) {
                                                 running = true;
                                                 status.setText("Running");
-                                                // if (editable) {
-                                                // allowEdits.setEnabled(false);
-                                                // }
                                         }
                                 });
                 JButton stopButton = new JButton("Stop");

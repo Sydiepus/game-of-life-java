@@ -28,7 +28,6 @@ public class Main {
                     firstCall = false;
                 }
                 game.applyRules(gameUI.getIterationsLabel());
-                // game.applyRules();
                 canvas.repaint();
             } else {
                 if (!firstCall && gameUI.isEditable()) {
