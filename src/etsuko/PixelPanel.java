@@ -215,8 +215,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
             System.out.println("old_pixel_x: " + old_pixel_x + ", old_pixel_y: " + old_pixel_y);
             if ((pixel_x != old_pixel_x || pixel_y != old_pixel_y) && (old_pixel_x != -1 && old_pixel_y != -1)) {
                 old_pixel = getPixel(old_pixel_x, old_pixel_y);
-                g.setColor(old_pixel.getColor());
-                g.fillRect(old_pixel.getX() * pixel_size, old_pixel.getY() * pixel_size, pixel_size, pixel_size);
+                repaintOldPixel(g);
                 g.setColor(selected_color);
                 g.fillRect(pixel_x * pixel_size, pixel_y * pixel_size, pixel_size, pixel_size);
                 g.dispose();
@@ -239,6 +238,10 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         g.setColor(color);
         g.fillRect(old_pixel.getX() * pixel_size, old_pixel.getY() * pixel_size, pixel_size, pixel_size);
 
+    }
+
+    public void repaintOldPixel(Graphics g) {
+        repaintOldPixel(g, old_pixel.getColor());
     }
 
     public void repaintOldPixel() {
