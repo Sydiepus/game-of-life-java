@@ -2,10 +2,12 @@ package etsuko;
 
 import java.util.ArrayList;
 
+import javax.swing.JLabel;
+
 public class GameOfLife {
     private ArrayList<Pixel> alive_cells;
     private PixelPanel canvas;
-    private int Iteration = 0;
+    private static long iteration = 0;
     private static int canvas_width;
     private static int canvas_height;
 
@@ -29,7 +31,7 @@ public class GameOfLife {
 
     }
 
-    public void apllyRules() {
+    public void applyRules() {
         ArrayList<Pixel> new_alive_cells = new ArrayList<Pixel>();
         for (int x = 0; x < canvas_width; x++) {
             for (int y = 0; y < canvas_height; y++) {
@@ -62,7 +64,13 @@ public class GameOfLife {
             }
         }
         alive_cells = new_alive_cells;
-        Iteration++;
+        iteration++;
+    }
+
+    public void applyRules(JLabel label){
+        applyRules();
+        // get the last integer from the
+        label.setText("Iterations: " + iteration);
     }
 
     private int getAliveNeighbours(Pixel cell) {

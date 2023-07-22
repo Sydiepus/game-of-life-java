@@ -12,14 +12,14 @@ public class Main {
         frame.setTitle("Game of life");
         frame.setVisible(true);
         PixelPanel canvas = new PixelPanel(40, 40);
-        GameOfLifeUI cp = new GameOfLifeUI(canvas);
-        frame.add(cp, BorderLayout.WEST);
+        GameOfLifeUI gameUI = new GameOfLifeUI(canvas);
+        frame.add(gameUI, BorderLayout.WEST);
         frame.add(canvas, BorderLayout.CENTER);
         GameOfLife game = null;
         Boolean firstCall = true;
         while (true) {
-            if (cp.isRunning()) {
-                if (game == null) {
+            if (gameUI.isRunning()) {
+                if (game == null || gameUI.isEditable()) {
                     game = new GameOfLife(canvas);
                 }
                 if (firstCall) {
@@ -27,13 +27,19 @@ public class Main {
                     canvas.removeMouseMotionListener(canvas);
                     firstCall = false;
                 }
-                game.apllyRules();
+                game.applyRules(gameUI.getIterationsLabel());
+                // game.applyRules();
                 canvas.repaint();
             } else {
-                if (!firstCall) {
+                if (!firstCall && gameUI.isEditable()) {
                     canvas.addMouseListener(canvas);
                     canvas.addMouseMotionListener(canvas);
                     firstCall = true;
+                } else if (firstCall && !gameUI.isEditable()) {
+                    canvas.removeMouseListener(canvas);
+                    canvas.removeMouseMotionListener(canvas);
+                    firstCall = false;
+
                 }
             }
             try {

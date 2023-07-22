@@ -5,11 +5,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+
 import java.awt.Color;
 //import java.awt.event.MouseListener;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 public class GameOfLifeUI extends JPanel implements ActionListener {
         private JLabel alive_color_label;
@@ -18,6 +22,8 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
         private JButton dead_color_picker;
         private PixelPanel canvas;
         private static boolean running = false;
+        private static boolean editable = false;
+        private JLabel iterationsLabel;
 
         GameOfLifeUI(PixelPanel canvas) {
                 super();
@@ -43,11 +49,21 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 dead_color_picker.setBackground(canvas.getBack());
                 alive_color_picker.addActionListener(this);
                 dead_color_picker.addActionListener(this);
+                JCheckBox allowEdits = new JCheckBox("Allow edits when paused ?", editable);
+                allowEdits.addItemListener(new ItemListener() {
+                        public void itemStateChanged(ItemEvent e) {
+                                editable = !editable;
+                                System.out.println(editable);
+                        }
+                });
                 JButton startButton = new JButton("Start");
                 startButton.addActionListener(
                                 new ActionListener() {
                                         public void actionPerformed(ActionEvent e) {
                                                 running = true;
+                                                // if (editable) {
+                                                //         allowEdits.setEnabled(false);
+                                                // }
                                         }
                                 });
                 JButton stopButton = new JButton("Stop");
@@ -56,6 +72,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                 running = false;
                         }
                 });
+                iterationsLabel = new JLabel("Iterations : 0");
                 layout.setAutoCreateGaps(true);
                 layout.setHorizontalGroup(
                                 layout.createSequentialGroup()
@@ -73,6 +90,8 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                                 GroupLayout.DEFAULT_SIZE,
                                                                                 GroupLayout.PREFERRED_SIZE)
                                                                 .addComponent(stopButton))
+                                                .addComponent(allowEdits)
+                                                .addComponent(iterationsLabel)
 
                 );
                 layout.setVerticalGroup(
@@ -91,7 +110,9 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                                 GroupLayout.PREFERRED_SIZE))
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                                                                 .addComponent(startButton)
-                                                                .addComponent(stopButton)));
+                                                                .addComponent(stopButton))
+                                                .addComponent(allowEdits)
+                                                .addComponent(iterationsLabel));
 
         }
 
@@ -110,5 +131,13 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
 
         public boolean isRunning() {
                 return running;
+        }
+
+        public boolean isEditable() {
+                return editable;
+        }
+
+        public JLabel getIterationsLabel(){
+                return iterationsLabel;
         }
 }
