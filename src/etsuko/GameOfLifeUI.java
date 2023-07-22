@@ -49,7 +49,8 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 dead_color_picker.setBackground(canvas.getBack());
                 alive_color_picker.addActionListener(this);
                 dead_color_picker.addActionListener(this);
-                JCheckBox allowEdits = new JCheckBox("Allow edits when paused ?", editable);
+                JCheckBox allowEdits = new JCheckBox("Enable edit", editable);
+                JLabel status = new JLabel("Not started");
                 allowEdits.addItemListener(new ItemListener() {
                         public void itemStateChanged(ItemEvent e) {
                                 editable = !editable;
@@ -61,8 +62,9 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                 new ActionListener() {
                                         public void actionPerformed(ActionEvent e) {
                                                 running = true;
+                                                status.setText("Running");
                                                 // if (editable) {
-                                                //         allowEdits.setEnabled(false);
+                                                // allowEdits.setEnabled(false);
                                                 // }
                                         }
                                 });
@@ -70,6 +72,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 stopButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                                 running = false;
+                                status.setText("Paused");
                         }
                 });
                 iterationsLabel = new JLabel("Iterations : 0");
@@ -80,6 +83,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                 .addComponent(alive_color_label)
                                                                 .addComponent(dead_color_label)
                                                                 .addComponent(startButton))
+                                                .addComponent(status)
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                                                                 .addComponent(alive_color_picker,
                                                                                 GroupLayout.PREFERRED_SIZE,
@@ -108,7 +112,8 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                                 GroupLayout.PREFERRED_SIZE,
                                                                                 GroupLayout.DEFAULT_SIZE,
                                                                                 GroupLayout.PREFERRED_SIZE))
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                                .addComponent(status)
+                                                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                                                                 .addComponent(startButton)
                                                                 .addComponent(stopButton))
                                                 .addComponent(allowEdits)
@@ -137,7 +142,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 return editable;
         }
 
-        public JLabel getIterationsLabel(){
+        public JLabel getIterationsLabel() {
                 return iterationsLabel;
         }
 }
