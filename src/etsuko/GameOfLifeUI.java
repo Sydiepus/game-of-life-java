@@ -66,11 +66,12 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 JCheckBox stopOnDead = new JCheckBox("Stop when possible", shouldStop);
                 stopOnDead.setToolTipText("Stop when there is no cells alive.");
                 String[] a = { "None", "Diehard", "Add pattern" };
-                JComboBox preDefinedPatternsBox = new JComboBox<String>(a);
+                JComboBox<String> preDefinedPatternsBox = new JComboBox<>(a);
 
                 preDefinedPatternsBox.addActionListener(new ActionListener() {
+                        @SuppressWarnings("unchecked")
                         public void actionPerformed(ActionEvent e) {
-                                JComboBox box = (JComboBox) e.getSource();
+                                JComboBox<String> box = (JComboBox<String>) e.getSource();
                                 String selectedItems = (String) box.getSelectedItem();
                                 if (selectedItems.equals("Add pattern")) {
                                         ArrayList<Pixel> patternToAdd = canvas.getPaintedPixels();
