@@ -1,8 +1,11 @@
 package etsuko;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JLabel;
+
+import java.awt.Color;
 
 public class GameOfLife {
     private ArrayList<Pixel> alive_cells;
@@ -11,6 +14,21 @@ public class GameOfLife {
     private static int canvas_width;
     private static int canvas_height;
     private boolean canStop = false;
+    public static final HashMap<String, ArrayList<Pixel>> predefinedPatterns = new HashMap<String, ArrayList<Pixel>>() {
+        {
+            put("Diehard", new ArrayList<Pixel>() {
+                {
+                    add(new Pixel(-3, 0, Color.WHITE));
+                    add(new Pixel(-2, 0, Color.WHITE));
+                    add(new Pixel(-2, 1, Color.WHITE));
+                    add(new Pixel(2, 1, Color.WHITE));
+                    add(new Pixel(3, -1, Color.WHITE));
+                    add(new Pixel(3, 1, Color.WHITE));
+                    add(new Pixel(4, 1, Color.WHITE));
+                }
+            });
+        }
+    };
 
     GameOfLife(PixelPanel canvas) {
         this.canvas = canvas;
@@ -20,16 +38,7 @@ public class GameOfLife {
     }
 
     private void initAliveCells() {
-        alive_cells = new ArrayList<Pixel>();
-        for (int x = 0; x < canvas_width; x++) {
-            for (int y = 0; y < canvas_height; y++) {
-                Pixel pixel = canvas.getPixel(x, y);
-                if (pixel.getColor() != canvas.getBack()) {
-                    alive_cells.add(pixel);
-                }
-            }
-        }
-
+        alive_cells = canvas.getPaintedPixels();
     }
 
     public void applyRules() {

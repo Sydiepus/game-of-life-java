@@ -1,6 +1,7 @@
 package etsuko;
 
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
@@ -12,6 +13,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.awt.event.ItemEvent;
 
 public class GameOfLifeUI extends JPanel implements ActionListener {
@@ -24,20 +26,6 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
         private static boolean running = false;
         private static boolean editable = false;
         private static boolean shouldStop = false;
-
-        /*
-         * Die Hard
-         * ...........-.
-         * .....--......
-         * ......-...---
-         */
-
-        /*
-         * center of canvas
-         * canvas.getCanvasSize().width /2
-         * canvas.getCanvasSize().height /2
-         * 
-         */
         private static boolean gridEnabled;
 
         private JLabel iterationsLabel;
@@ -77,6 +65,26 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 status = new JLabel("Not started");
                 JCheckBox stopOnDead = new JCheckBox("Stop when possible", shouldStop);
                 stopOnDead.setToolTipText("Stop when there is no cells alive.");
+                String[] a = { "None", "Diehard", "Add pattern" };
+                JComboBox preDefinedPatternsBox = new JComboBox<String>(a);
+
+                preDefinedPatternsBox.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                                JComboBox box = (JComboBox) e.getSource();
+                                String selectedItems = (String) box.getSelectedItem();
+                                if (selectedItems.equals("Add pattern")) {
+                                        ArrayList<Pixel> patternToAdd = canvas.getPaintedPixels();
+                                        System.out.println(patternToAdd);
+                                        int[] bound = findBoundaries(patternToAdd);
+                                        transformPattern(patternToAdd, bound);
+                                } else if (selectedItems.equals("Diehard")) {
+                                       ArrayList<Pixel> pattern =  GameOfLife.predefinedPatterns.get("Diehard");
+                                       canvas.setSelectedPattern(pattern);
+                                } else if (selectedItems.equals("None")) {
+                                        canvas.setSelectedPattern(null);
+                                }
+                        }
+                });
 
                 stopOnDead.addItemListener(new ItemListener() {
                         public void itemStateChanged(ItemEvent e) {
@@ -143,6 +151,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                 .addComponent(allowEdits)
                                                 .addComponent(stopOnDead)
                                                 .addComponent(iterationsLabel)
+                                                .addComponent(preDefinedPatternsBox)
 
                 );
                 layout.setVerticalGroup(
@@ -172,7 +181,10 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                 .addComponent(stopButton))
                                                 .addComponent(allowEdits)
                                                 .addComponent(stopOnDead)
-                                                .addComponent(iterationsLabel));
+                                                .addComponent(iterationsLabel)
+                                                .addComponent(preDefinedPatternsBox)
+
+                );
 
         }
 
@@ -190,6 +202,57 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                         canvas.setBack(color);
                 }
         };
+
+        private int[] findBoundaries(ArrayList<Pixel> pixels) {
+                Pixel pix = pixels.get(0);
+                int highX, highY, lowX, lowY;
+                highX = lowX = pix.getX();
+                highY = lowY = pix.getY();
+                for (Pixel pixel : pixels) {
+                        int tmpX = pixel.getX();
+                        int tmpY = pixel.getY();
+                        if (tmpX > highX) {
+                                highX = tmpX;
+                        }
+                        if (tmpY > highY) {
+                                highY = tmpY;
+                        }
+                        if (tmpX < lowX) {
+                                lowX = tmpX;
+                        }
+                        if (tmpY < lowY) {
+                                lowY = tmpY;
+                        }
+                }
+                int[] a = { lowX, lowY, (highX - lowX), (highY - lowY) };
+                return a;
+        }
+
+        private void transformPattern(ArrayList<Pixel> pixels, int[] measurements) {
+                // lowX, lowY, deltaX, deltaY
+                // transform the Pattern into a rectangle with pixels relative to the center of
+                // the rectangle.
+                ArrayList<Pixel> transPixels = new ArrayList<Pixel>();
+                System.out.println("Center X: " + (measurements[2]) / 2 + " Y: " + (measurements[3]) / 2);
+                for (Pixel pixel : pixels) {
+                        int newPixelX = (pixel.getX() - measurements[0]) - (measurements[2] / 2);
+                        int newPixelY = (pixel.getY() - measurements[1]) - (measurements[3] / 2);
+                        transPixels.add(new Pixel(newPixelX, newPixelY, Color.WHITE));
+                        //System.out.println("add(new Pixel(" + newPixelX + "," + newPixelY + "," + " Color.WHITE))");
+                        /*
+                         * Die Hard
+                         * (-3, 0)
+                         * (-2, 0)
+                         * (-2, 1)
+                         * (2, 1)
+                         * (3, -1)
+                         * (3, 1)
+                         * (4, 1)
+                         */
+                        // TODO: Complete this.
+
+                }
+        }
 
         public boolean isRunning() {
                 return running;

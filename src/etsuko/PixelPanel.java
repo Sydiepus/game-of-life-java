@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.Dimension;
+import java.util.ArrayList;
 
 public class PixelPanel extends JPanel implements MouseInputListener {
     private int pixel_size;
@@ -19,6 +20,8 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     private static Pixel oldPixel = null;
     private static boolean pixelGrid = false;
     private Color gridColor = Color.GRAY;
+    private ArrayList<Pixel> selectedPattern = null;
+    private boolean highlight = false;
 
     PixelPanel(int width, int height) {
         super();
@@ -95,6 +98,19 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         return canvasSize;
     }
 
+    public ArrayList<Pixel> getPaintedPixels() {
+        ArrayList<Pixel> paintedPixels = new ArrayList<Pixel>();
+        for (int x = 0; x < canvasSize.width; x++) {
+            for (int y = 0; y < canvasSize.height; y++) {
+                Pixel pixel = getPixel(x, y);
+                if (!pixel.getColor().equals(getBack())) {
+                    paintedPixels.add(pixel);
+                }
+            }
+        }
+        return paintedPixels;
+    }
+
     private int normalize_x(int x) throws OutOfBoundsException {
         int norm_x = x / pixel_size;
         if (norm_x >= canvasSize.width || norm_x < 0) {
@@ -123,19 +139,47 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         return pixels;
     }
 
-    private void drawPixel(int x, int y) {
+    private void handlePattern(int pixel_x, int pixel_y) {
+        for (Pixel pixel : selectedPattern) {
+            int tmpX = pixel.getX() + pixel_x;
+            int tmpY = pixel.getY() + pixel_y;
+            drawPixel(tmpX, tmpY);
+        }
+    }
+
+    private void handleOldPattern() {
+        for (Pixel pixel : selectedPattern) {
+            try {
+                Pixel oldPixel = getPixel(pixel.getX() + oldPixelX, pixel.getY() + oldPixelY);
+                drawPixel(oldPixel, getGraphics());
+            } catch (IndexOutOfBoundsException ex) {
+            }
+        }
+    }
+
+    private void handleOldPixel() {
+        oldPixel = getPixel(oldPixelX, oldPixelY);
+        drawPixel(oldPixel, getGraphics());
+    }
+
+    private void handleOldStuff() {
+        handleOldPixel();
+        if (selectedPattern != null) {
+            handleOldPattern();
+        }
+    }
+
+    private void drawPixel(int pixelX, int pixelY) {
         Graphics g = getGraphics();
         try {
-            int pixel_x = normalize_x(x);
-            int pixel_y = normalize_y(y);
-            Pixel pixel = getPixel(pixel_x, pixel_y);
-            pixel.setColor(selected_color);
+            Pixel pixel = getPixel(pixelX, pixelY);
+            if (!highlight) {
+                pixel.setColor(selected_color);
+            }
             drawPixel(pixel, selected_color, g);
-        } catch (OutOfBoundsException e) {
-            return;
-        } finally {
-            g.dispose();
+        } catch (IndexOutOfBoundsException ex) {
         }
+        g.dispose();
     }
 
     private void drawPixel(Pixel pixel, Graphics g) {
@@ -153,6 +197,10 @@ public class PixelPanel extends JPanel implements MouseInputListener {
 
     private int calculatePixelSize() {
         return Math.min(getWidth(), getHeight()) / Math.min(canvasSize.width, canvasSize.height);
+    }
+
+    public void setSelectedPattern(ArrayList<Pixel> selectedPattern) {
+        this.selectedPattern = selectedPattern;
     }
 
     public Color getSelectedColor() {
@@ -185,14 +233,28 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         return pixelGrid;
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        drawPixel(e.getX(), e.getY());
+    private void handleClickEvent(MouseEvent e) {
+        highlight = false;
+        try {
+            int pixelX = normalize_x(e.getX());
+            int pixelY = normalize_y(e.getY());
+            if (selectedPattern != null) {
+                handlePattern(pixelX, pixelY);
+            } else {
+                drawPixel(pixelX, pixelY);
+            }
+        } catch (OutOfBoundsException ex) {
+        }
 
     }
 
     @Override
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
     public void mousePressed(MouseEvent e) {
+        handleClickEvent(e);
     }
 
     @Override
@@ -205,39 +267,36 @@ public class PixelPanel extends JPanel implements MouseInputListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
-        oldPixel = getPixel(oldPixelX, oldPixelY);
-        drawPixel(oldPixel, getGraphics());
+        handleOldStuff();
+        oldPixelX = oldPixelY = 0;
     }
 
     public void mouseDragged(MouseEvent e) {
-        drawPixel(e.getX(), e.getY());
-
+        handleClickEvent(e);
     }
 
     public void mouseMoved(MouseEvent e) {
+        highlight = true;
+        Graphics g = getGraphics();
         try {
             int pixelX = normalize_x(e.getX());
             int pixelY = normalize_y(e.getY());
-            Graphics g = getGraphics();
-            if ((pixelX != oldPixelX || pixelY != oldPixelY) && (oldPixelX != -1 && oldPixelY != -1)) {
-                oldPixel = getPixel(oldPixelX, oldPixelY);
-                drawPixel(oldPixel, g);
-                Pixel selectedPixel = getPixel(pixelX, pixelY);
-                drawPixel(selectedPixel, selected_color, g);
-                g.dispose();
-                oldPixelX = pixelX;
-                oldPixelY = pixelY;
-            } else if ((oldPixelX == pixelX && oldPixelY == pixelY)
-                    && (oldPixel = getPixel(oldPixelX, oldPixelY)).getColor().equals(back)) {
-
-                drawPixel(oldPixel, selected_color, g);
-                g.dispose();
-
+            if (pixelX == oldPixelX && pixelY == oldPixelY) {
+                return;
             }
+            handleOldStuff();
+            if (selectedPattern != null) {
+                handlePattern(pixelX, pixelY);
+            } else {
+                drawPixel(pixelX, pixelY);
+            }
+            oldPixelX = pixelX;
+            oldPixelY = pixelY;
         } catch (OutOfBoundsException ex) {
-            oldPixel = getPixel(oldPixelX, oldPixelY);
-            drawPixel(oldPixel, getGraphics());
-            return;
+            handleOldStuff();
+            oldPixelX = oldPixelY = 0;
+        } finally {
+            g.dispose();
         }
     }
 
