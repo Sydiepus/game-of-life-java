@@ -14,16 +14,18 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     private static Pixel[][] pixels;
     private Color back = Color.BLACK;
     private Color selected_color = Color.WHITE;
-    private static int old_pixel_x = 0;
-    private static int old_pixel_y = 0;
-    private static Pixel old_pixel = null;
+    private static int oldPixelX = 0;
+    private static int oldPixelY = 0;
+    private static Pixel oldPixel = null;
+    private static boolean pixelGrid = false;
+    private Color gridColor = Color.GRAY;
 
     PixelPanel(int width, int height) {
         super();
         pixels = new Pixel[width][height];
         canvas_size = new Dimension(width, height);
         initPixels();
-        old_pixel = pixels[0][0];
+        oldPixel = pixels[0][0];
         setMinimumSize(new Dimension(width * 10, height * 10));
         setMaximumSize(new Dimension(width * 10, height * 10));
         setPreferredSize(new Dimension(width * 10, height * 10));
@@ -118,17 +120,25 @@ public class PixelPanel extends JPanel implements MouseInputListener {
             int pixel_y = normalize_y(y);
             Pixel pixel = getPixel(pixel_x, pixel_y);
             pixel.setColor(selected_color);
-            g.setColor(selected_color);
-            g.fillRect(pixel_x * pixel_size, pixel_y * pixel_size, pixel_size, pixel_size);
+            drawPixel(pixel, selected_color, g);
         } catch (OutOfBoundsException e) {
             return;
+        } finally {
+            g.dispose();
         }
-        g.dispose();
     }
 
     private void drawPixel(Pixel pixel, Graphics g) {
-        g.setColor(pixel.getColor());
+        drawPixel(pixel, pixel.getColor(), g);
+    }
+
+    private void drawPixel(Pixel pixel, Color color, Graphics g) {
+        g.setColor(color);
         g.fillRect(pixel.getX() * pixel_size, pixel.getY() * pixel_size, pixel_size, pixel_size);
+        if (pixelGrid) {
+            g.setColor(gridColor);
+            g.drawRect(pixel.getX() * pixel_size, pixel.getY() * pixel_size, pixel_size, pixel_size);
+        }
     }
 
     private int calculatePixelSize() {
@@ -145,28 +155,48 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         repaint();
     }
 
+    public void setGridColor(Color color) {
+        gridColor = color;
+        if (pixelGrid) {
+            repaint();
+        }
+    }
+
+    public Color getGridColor() {
+        return gridColor;
+    }
+
+    public void setEnableGrid(boolean enable) {
+        pixelGrid = enable;
+        repaint();
+    }
+
+    public boolean isGridEnabled() {
+        return pixelGrid;
+    }
+
     @Override
-    public void mouseClicked(java.awt.event.MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {
         drawPixel(e.getX(), e.getY());
 
     }
 
     @Override
-    public void mousePressed(java.awt.event.MouseEvent e) {
+    public void mousePressed(MouseEvent e) {
     }
 
     @Override
-    public void mouseReleased(java.awt.event.MouseEvent e) {
+    public void mouseReleased(MouseEvent e) {
     }
 
     @Override
-    public void mouseEntered(java.awt.event.MouseEvent e) {
+    public void mouseEntered(MouseEvent e) {
     }
 
     @Override
-    public void mouseExited(java.awt.event.MouseEvent e) {
-        old_pixel = getPixel(old_pixel_x, old_pixel_y);
-        repaintOldPixel();
+    public void mouseExited(MouseEvent e) {
+        oldPixel = getPixel(oldPixelX, oldPixelY);
+        drawPixel(oldPixel, getGraphics());
     }
 
     public void mouseDragged(MouseEvent e) {
@@ -176,44 +206,29 @@ public class PixelPanel extends JPanel implements MouseInputListener {
 
     public void mouseMoved(MouseEvent e) {
         try {
-            int pixel_x = normalize_x(e.getX());
-            int pixel_y = normalize_y(e.getY());
+            int pixelX = normalize_x(e.getX());
+            int pixelY = normalize_y(e.getY());
             Graphics g = getGraphics();
-            if ((pixel_x != old_pixel_x || pixel_y != old_pixel_y) && (old_pixel_x != -1 && old_pixel_y != -1)) {
-                old_pixel = getPixel(old_pixel_x, old_pixel_y);
-                repaintOldPixel(g);
-                g.setColor(selected_color);
-                g.fillRect(pixel_x * pixel_size, pixel_y * pixel_size, pixel_size, pixel_size);
+            if ((pixelX != oldPixelX || pixelY != oldPixelY) && (oldPixelX != -1 && oldPixelY != -1)) {
+                oldPixel = getPixel(oldPixelX, oldPixelY);
+                drawPixel(oldPixel, g);
+                Pixel selectedPixel = getPixel(pixelX, pixelY);
+                drawPixel(selectedPixel, selected_color, g);
                 g.dispose();
-                old_pixel_x = pixel_x;
-                old_pixel_y = pixel_y;
-            } else if ((old_pixel_x == pixel_x && old_pixel_y == pixel_y)
-                    && (old_pixel = getPixel(old_pixel_x, old_pixel_y)).getColor().equals(back)) {
-                repaintOldPixel(g, selected_color);
+                oldPixelX = pixelX;
+                oldPixelY = pixelY;
+            } else if ((oldPixelX == pixelX && oldPixelY == pixelY)
+                    && (oldPixel = getPixel(oldPixelX, oldPixelY)).getColor().equals(back)) {
+
+                drawPixel(oldPixel, selected_color, g);
                 g.dispose();
 
             }
         } catch (OutOfBoundsException ex) {
-            old_pixel = getPixel(old_pixel_x, old_pixel_y);
-            repaintOldPixel();
+            oldPixel = getPixel(oldPixelX, oldPixelY);
+            drawPixel(oldPixel, getGraphics());
             return;
         }
-    }
-
-    public void repaintOldPixel(Graphics g, Color color) {
-        g.setColor(color);
-        g.fillRect(old_pixel.getX() * pixel_size, old_pixel.getY() * pixel_size, pixel_size, pixel_size);
-
-    }
-
-    public void repaintOldPixel(Graphics g) {
-        repaintOldPixel(g, old_pixel.getColor());
-    }
-
-    public void repaintOldPixel() {
-        Graphics g = getGraphics();
-        repaintOldPixel(g, old_pixel.getColor());
-        g.dispose();
     }
 
     class OutOfBoundsException extends Exception {

@@ -15,6 +15,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 
 public class GameOfLifeUI extends JPanel implements ActionListener {
+        private static Dimension colorButtonDimension = new Dimension(20, 20);
         private JLabel alive_color_label;
         private JButton alive_color_picker;
         private JLabel dead_color_label;
@@ -22,6 +23,8 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
         private PixelPanel canvas;
         private static boolean running = false;
         private static boolean editable = false;
+        private static boolean gridEnabled;
+
         private JLabel iterationsLabel;
 
         GameOfLifeUI(PixelPanel canvas) {
@@ -35,17 +38,35 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 alive_color_label = new JLabel("Alive color : ");
                 alive_color_picker = new JButton();
                 alive_color_picker.setToolTipText("Alive cells");
-                alive_color_picker.setPreferredSize(new Dimension(20, 20));
+                alive_color_picker.setPreferredSize(colorButtonDimension);
                 alive_color_picker.setBackground(canvas.getSelectedColor());
                 dead_color_label = new JLabel("Dead color : ");
                 dead_color_picker = new JButton();
                 dead_color_picker.setToolTipText("Dead cells");
-                dead_color_picker.setPreferredSize(new Dimension(20, 20));
+                dead_color_picker.setPreferredSize(colorButtonDimension);
                 dead_color_picker.setBackground(canvas.getBack());
                 alive_color_picker.addActionListener(this);
                 dead_color_picker.addActionListener(this);
                 JCheckBox allowEdits = new JCheckBox("Enable edit", editable);
+                gridEnabled = canvas.isGridEnabled();
+                JCheckBox enableGrid = new JCheckBox("Enable grid", gridEnabled);
+                JLabel gridLabel = new JLabel("Grid color : ");
+                JButton gridColorButton = new JButton();
+                gridColorButton.setToolTipText("Grid");
+                gridColorButton.setPreferredSize(colorButtonDimension);
+                gridColorButton.setBackground(canvas.getGridColor());
+                gridColorButton.setVisible(gridEnabled);
+                gridColorButton.addActionListener(this);
                 JLabel status = new JLabel("Not started");
+
+                enableGrid.addItemListener(new ItemListener() {
+                        public void itemStateChanged(ItemEvent e) {
+                                gridEnabled = !gridEnabled;
+                                canvas.setEnableGrid(gridEnabled);
+                                gridColorButton.setVisible(gridEnabled);
+
+                        }
+                });
                 allowEdits.addItemListener(new ItemListener() {
                         public void itemStateChanged(ItemEvent e) {
                                 editable = !editable;
@@ -74,6 +95,12 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                 .addComponent(alive_color_label)
                                                                 .addComponent(dead_color_label)
                                                                 .addComponent(startButton))
+                                                .addComponent(enableGrid)
+                                                .addComponent(gridLabel)
+                                                .addComponent(gridColorButton,
+                                                                GroupLayout.PREFERRED_SIZE,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                GroupLayout.PREFERRED_SIZE)
                                                 .addComponent(status)
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                                                                 .addComponent(alive_color_picker,
@@ -103,8 +130,15 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                                 GroupLayout.PREFERRED_SIZE,
                                                                                 GroupLayout.DEFAULT_SIZE,
                                                                                 GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(enableGrid)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                                                .addComponent(gridLabel)
+                                                                .addComponent(gridColorButton,
+                                                                                GroupLayout.PREFERRED_SIZE,
+                                                                                GroupLayout.DEFAULT_SIZE,
+                                                                                GroupLayout.PREFERRED_SIZE))
                                                 .addComponent(status)
-                                                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                                                                 .addComponent(startButton)
                                                                 .addComponent(stopButton))
                                                 .addComponent(allowEdits)
@@ -120,6 +154,8 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 pressed_button.setBackground(color);
                 if (pressed_button.getToolTipText().contains("Alive")) {
                         canvas.setSelectedColor(color);
+                } else if (pressed_button.getToolTipText().contains("Grid")) {
+                        canvas.setGridColor(color);
                 } else {
                         canvas.setBack(color);
                 }
