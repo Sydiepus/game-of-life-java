@@ -10,7 +10,7 @@ import java.awt.Dimension;
 
 public class PixelPanel extends JPanel implements MouseInputListener {
     private int pixel_size;
-    private Dimension canvas_size;
+    private Dimension canvasSize;
     private static Pixel[][] pixels;
     private Color back = Color.BLACK;
     private Color selected_color = Color.WHITE;
@@ -23,7 +23,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     PixelPanel(int width, int height) {
         super();
         pixels = new Pixel[width][height];
-        canvas_size = new Dimension(width, height);
+        canvasSize = new Dimension(width, height);
         initPixels();
         oldPixel = pixels[0][0];
         setMinimumSize(new Dimension(width * 10, height * 10));
@@ -36,16 +36,16 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     }
 
     private void initPixels() {
-        for (int x = 0; x < canvas_size.width; x++) {
-            for (int y = 0; y < canvas_size.height; y++) {
+        for (int x = 0; x < canvasSize.width; x++) {
+            for (int y = 0; y < canvasSize.height; y++) {
                 pixels[x][y] = new Pixel(x, y, back);
             }
         }
     }
 
     private void changeColor(Color color, Color oldColor) {
-        for (int x = 0; x < canvas_size.width; x++) {
-            for (int y = 0; y < canvas_size.height; y++) {
+        for (int x = 0; x < canvasSize.width; x++) {
+            for (int y = 0; y < canvasSize.height; y++) {
                 Pixel pixel = pixels[x][y];
                 if (pixel.getColor() == oldColor) {
                     pixel.setColor(color);
@@ -69,25 +69,35 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     @Override
     public void paint(Graphics g) {
         pixel_size = calculatePixelSize();
-        // Clear the frame.
-        g.setColor(getBackground());
-        g.fillRect(0, 0, getWidth(), getHeight());
+        clear(g);
         // Draw the pixels.
-        for (int x = 0; x < canvas_size.width; x++) {
-            for (int y = 0; y < canvas_size.height; y++) {
+        for (int x = 0; x < canvasSize.width; x++) {
+            for (int y = 0; y < canvasSize.height; y++) {
                 drawPixel(pixels[x][y], g);
             }
         }
         g.dispose();
     }
 
+    public void clear(Graphics g) {
+        // Clear the frame.
+        g.setColor(getBackground());
+        g.fillRect(0, 0, getWidth(), getHeight());
+    }
+
+    public void clear() {
+        Graphics g = getGraphics();
+        clear(g);
+        g.dispose();
+    }
+
     public Dimension getCanvasSize() {
-        return canvas_size;
+        return canvasSize;
     }
 
     private int normalize_x(int x) throws OutOfBoundsException {
         int norm_x = x / pixel_size;
-        if (norm_x >= canvas_size.width || norm_x < 0) {
+        if (norm_x >= canvasSize.width || norm_x < 0) {
             throw new OutOfBoundsException("x out of bounds");
         }
         return norm_x;
@@ -95,7 +105,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
 
     private int normalize_y(int y) throws OutOfBoundsException {
         int norm_y = y / pixel_size;
-        if (norm_y >= canvas_size.height || norm_y < 0) {
+        if (norm_y >= canvasSize.height || norm_y < 0) {
             throw new OutOfBoundsException("y out of bounds");
         }
         return norm_y;
@@ -142,7 +152,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     }
 
     private int calculatePixelSize() {
-        return Math.min(getWidth(), getHeight()) / Math.min(canvas_size.width, canvas_size.height);
+        return Math.min(getWidth(), getHeight()) / Math.min(canvasSize.width, canvasSize.height);
     }
 
     public Color getSelectedColor() {

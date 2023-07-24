@@ -29,6 +29,10 @@ public class Main {
                 }
                 game.applyRules(gameUI.getIterationsLabel());
                 canvas.repaint();
+                if (game.canStop() && gameUI.shouldStop()) {
+                    gameUI.stop();
+                    game.resetIterations();
+                }
             } else {
                 if (!firstCall && gameUI.isEditable()) {
                     canvas.addMouseListener(canvas);
@@ -38,7 +42,6 @@ public class Main {
                     canvas.removeMouseListener(canvas);
                     canvas.removeMouseMotionListener(canvas);
                     firstCall = false;
-
                 }
             }
             try {

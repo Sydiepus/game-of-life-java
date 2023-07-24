@@ -23,9 +23,25 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
         private PixelPanel canvas;
         private static boolean running = false;
         private static boolean editable = false;
+        private static boolean shouldStop = false;
+
+        /*
+         * Die Hard
+         * ...........-.
+         * .....--......
+         * ......-...---
+         */
+
+        /*
+         * center of canvas
+         * canvas.getCanvasSize().width /2
+         * canvas.getCanvasSize().height /2
+         * 
+         */
         private static boolean gridEnabled;
 
         private JLabel iterationsLabel;
+        private JLabel status;
 
         GameOfLifeUI(PixelPanel canvas) {
                 super();
@@ -51,18 +67,27 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 gridEnabled = canvas.isGridEnabled();
                 JCheckBox enableGrid = new JCheckBox("Enable grid", gridEnabled);
                 JLabel gridLabel = new JLabel("Grid color : ");
+                gridLabel.setVisible(gridEnabled);
                 JButton gridColorButton = new JButton();
                 gridColorButton.setToolTipText("Grid");
                 gridColorButton.setPreferredSize(colorButtonDimension);
                 gridColorButton.setBackground(canvas.getGridColor());
                 gridColorButton.setVisible(gridEnabled);
                 gridColorButton.addActionListener(this);
-                JLabel status = new JLabel("Not started");
+                status = new JLabel("Not started");
+                JCheckBox stopOnDead = new JCheckBox("Stop when possible", shouldStop);
+                stopOnDead.setToolTipText("Stop when there is no cells alive.");
 
+                stopOnDead.addItemListener(new ItemListener() {
+                        public void itemStateChanged(ItemEvent e) {
+                                shouldStop = !shouldStop;
+                        }
+                });
                 enableGrid.addItemListener(new ItemListener() {
                         public void itemStateChanged(ItemEvent e) {
                                 gridEnabled = !gridEnabled;
                                 canvas.setEnableGrid(gridEnabled);
+                                gridLabel.setVisible(gridEnabled);
                                 gridColorButton.setVisible(gridEnabled);
 
                         }
@@ -76,15 +101,18 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 startButton.addActionListener(
                                 new ActionListener() {
                                         public void actionPerformed(ActionEvent e) {
-                                                running = true;
-                                                status.setText("Running");
+                                                start();
+                                                stopOnDead.setEnabled(false);
+                                                allowEdits.setEnabled(false);
                                         }
                                 });
                 JButton stopButton = new JButton("Stop");
                 stopButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                                running = false;
-                                status.setText("Paused");
+                                stop();
+                                stopOnDead.setEnabled(true);
+                                allowEdits.setEnabled(true);
+
                         }
                 });
                 iterationsLabel = new JLabel("Iterations : 0");
@@ -113,6 +141,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                                 GroupLayout.PREFERRED_SIZE)
                                                                 .addComponent(stopButton))
                                                 .addComponent(allowEdits)
+                                                .addComponent(stopOnDead)
                                                 .addComponent(iterationsLabel)
 
                 );
@@ -142,6 +171,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                 .addComponent(startButton)
                                                                 .addComponent(stopButton))
                                                 .addComponent(allowEdits)
+                                                .addComponent(stopOnDead)
                                                 .addComponent(iterationsLabel));
 
         }
@@ -171,5 +201,19 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
 
         public JLabel getIterationsLabel() {
                 return iterationsLabel;
+        }
+
+        public boolean shouldStop() {
+                return shouldStop;
+        }
+
+        public void stop() {
+                running = false;
+                status.setText("Paused");
+        }
+
+        public void start() {
+                running = true;
+                status.setText("Running");
         }
 }

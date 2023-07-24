@@ -10,6 +10,7 @@ public class GameOfLife {
     private static long iteration = 0;
     private static int canvas_width;
     private static int canvas_height;
+    private boolean canStop = false;
 
     GameOfLife(PixelPanel canvas) {
         this.canvas = canvas;
@@ -65,9 +66,12 @@ public class GameOfLife {
         }
         alive_cells = new_alive_cells;
         iteration++;
+        if (alive_cells.size() == 0) {
+            canStop = true;
+        }
     }
 
-    public void applyRules(JLabel label){
+    public void applyRules(JLabel label) {
         applyRules();
         // get the last integer from the
         label.setText("Iterations: " + iteration);
@@ -91,5 +95,13 @@ public class GameOfLife {
         int x2 = cell2.getX();
         int y2 = cell2.getY();
         return (x1 == x2 || x1 == x2 - 1 || x1 == x2 + 1) && (y1 == y2 || y1 == y2 - 1 || y1 == y2 + 1);
+    }
+
+    public boolean canStop() {
+        return canStop;
+    }
+
+    public void resetIterations() {
+        iteration = 0;
     }
 }
