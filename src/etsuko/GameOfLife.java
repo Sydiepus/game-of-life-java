@@ -27,6 +27,70 @@ public class GameOfLife {
                     add(new Pixel(4, 1, Color.WHITE));
                 }
             });
+            put("T", new ArrayList<Pixel>() {
+                {
+                    add(new Pixel(-2, -2, Color.WHITE));
+                    add(new Pixel(-1, -2, Color.WHITE));
+                    add(new Pixel(0, -2, Color.WHITE));
+                    add(new Pixel(0, -1, Color.WHITE));
+                    add(new Pixel(0, 0, Color.WHITE));
+                    add(new Pixel(0, 1, Color.WHITE));
+                    add(new Pixel(0, 2, Color.WHITE));
+                    add(new Pixel(1, -2, Color.WHITE));
+                    add(new Pixel(2, -2, Color.WHITE));
+                }
+            });
+            put("C", new ArrayList<Pixel>() {
+                {
+                    add(new Pixel(-2, -1, Color.WHITE));
+                    add(new Pixel(-2, 0, Color.WHITE));
+                    add(new Pixel(-2, 1, Color.WHITE));
+                    add(new Pixel(-1, -2, Color.WHITE));
+                    add(new Pixel(-1, 2, Color.WHITE));
+                    add(new Pixel(0, -2, Color.WHITE));
+                    add(new Pixel(0, 2, Color.WHITE));
+                    add(new Pixel(1, -2, Color.WHITE));
+                    add(new Pixel(1, 2, Color.WHITE));
+                    add(new Pixel(2, -2, Color.WHITE));
+                    add(new Pixel(2, 2, Color.WHITE));
+                }
+            });
+            put("A", new ArrayList<Pixel>() {
+                {
+                    add(new Pixel(-2, -1, Color.WHITE));
+                    add(new Pixel(-2, 0, Color.WHITE));
+                    add(new Pixel(-2, 1, Color.WHITE));
+                    add(new Pixel(-2, 2, Color.WHITE));
+                    add(new Pixel(-1, -2, Color.WHITE));
+                    add(new Pixel(-1, 0, Color.WHITE));
+                    add(new Pixel(0, -2, Color.WHITE));
+                    add(new Pixel(0, 0, Color.WHITE));
+                    add(new Pixel(1, -2, Color.WHITE));
+                    add(new Pixel(1, 0, Color.WHITE));
+                    add(new Pixel(2, -1, Color.WHITE));
+                    add(new Pixel(2, 0, Color.WHITE));
+                    add(new Pixel(2, 1, Color.WHITE));
+                    add(new Pixel(2, 2, Color.WHITE));
+                }
+            });
+            put("G", new ArrayList<Pixel>() {
+                {
+                    add(new Pixel(-2, -1, Color.WHITE));
+                    add(new Pixel(-2, 0, Color.WHITE));
+                    add(new Pixel(-2, 1, Color.WHITE));
+                    add(new Pixel(-1, -2, Color.WHITE));
+                    add(new Pixel(-1, 2, Color.WHITE));
+                    add(new Pixel(0, -2, Color.WHITE));
+                    add(new Pixel(0, 2, Color.WHITE));
+                    add(new Pixel(1, -2, Color.WHITE));
+                    add(new Pixel(1, 0, Color.WHITE));
+                    add(new Pixel(1, 2, Color.WHITE));
+                    add(new Pixel(2, -2, Color.WHITE));
+                    add(new Pixel(2, 0, Color.WHITE));
+                    add(new Pixel(2, 1, Color.WHITE));
+                    add(new Pixel(2, 2, Color.WHITE));
+                }
+            });
         }
     };
 

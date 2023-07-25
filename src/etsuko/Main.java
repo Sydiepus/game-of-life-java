@@ -11,13 +11,21 @@ public class Main {
         frame.setSize(500, 500);
         frame.setTitle("Game of life");
         frame.setVisible(true);
-        PixelPanel canvas = new PixelPanel(40, 40);
+        PixelPanel canvas = new PixelPanel(137, 77);
         GameOfLifeUI gameUI = new GameOfLifeUI(canvas);
         frame.add(gameUI, BorderLayout.WEST);
         frame.add(canvas, BorderLayout.CENTER);
         GameOfLife game = null;
         Boolean firstCall = true;
         while (true) {
+            if (gameUI.shouldReset()) {
+                if (game != null) {
+                    game.resetIterations();
+                    game = null;
+                }
+                canvas.clean();
+                gameUI.resetDone();
+            }
             if (gameUI.isRunning()) {
                 if (game == null || gameUI.isEditable()) {
                     game = new GameOfLife(canvas);

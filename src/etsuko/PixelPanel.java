@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PixelPanel extends JPanel implements MouseInputListener {
     private int pixel_size;
@@ -92,6 +93,16 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         Graphics g = getGraphics();
         clear(g);
         g.dispose();
+    }
+
+    public void clean() {
+        clear();
+        initPixels();
+        oldPixelX = 0;
+        oldPixelY = 0;
+        oldPixel = null;
+        selectedPattern = null;
+        repaint();
     }
 
     public Dimension getCanvasSize() {
@@ -193,6 +204,25 @@ public class PixelPanel extends JPanel implements MouseInputListener {
             g.setColor(gridColor);
             g.drawRect(pixel.getX() * pixel_size, pixel.getY() * pixel_size, pixel_size, pixel_size);
         }
+    }
+
+    public void drawPatternOfPatterns(String patternOfPattern, HashMap<String, ArrayList<Pixel>> patterns, int[] offset,
+            boolean wrap, int repeat) {
+        // patternOfPattern is a string containing the pattern, a pattern should be
+        // available in patterns else it i'll be considered like a space.
+        // a space is a ... space between the current and the next pattern.
+        // The ArrayList should contain the pixels of the pattern that should be
+        // painted, the coordinates of the pixels should be relative to
+        // a fictional center as in the center of the smallest rectangle that contains
+        // all the pixels
+        // offset are the coordinates of the center that you want, e.g if a pattern is
+        // 5x5 wide you'ld want an offset of +5, +5 so all the pattern would be painted
+        // correctly.
+        // wrap is used to determine if the pattern should bet painted on the next
+        // "line" if it doesn't fit.
+        // repeat number of times to repeat pattern, negative means infinite, aka fill
+        // the whole canvas.
+        // TODO : implement this.
     }
 
     private int calculatePixelSize() {

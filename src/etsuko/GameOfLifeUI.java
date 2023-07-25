@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Set;
 import java.awt.event.ItemEvent;
 
 public class GameOfLifeUI extends JPanel implements ActionListener {
@@ -27,6 +28,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
         private static boolean editable = false;
         private static boolean shouldStop = false;
         private static boolean gridEnabled;
+        private static boolean reset = false;
 
         private JLabel iterationsLabel;
         private JLabel status;
@@ -65,24 +67,26 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 status = new JLabel("Not started");
                 JCheckBox stopOnDead = new JCheckBox("Stop when possible", shouldStop);
                 stopOnDead.setToolTipText("Stop when there is no cells alive.");
-                String[] a = { "None", "Diehard", "Add pattern" };
+                Set<String> b = GameOfLife.predefinedPatterns.keySet();
+                String[] a = new String[b.size() + 2];
+                a[0] = "None";
+                a[b.size() + 1] = "Add pattern";
+                System.arraycopy(b.toArray(), 0, a, 1, b.size());
                 JComboBox<String> preDefinedPatternsBox = new JComboBox<>(a);
 
                 preDefinedPatternsBox.addActionListener(new ActionListener() {
                         @SuppressWarnings("unchecked")
                         public void actionPerformed(ActionEvent e) {
                                 JComboBox<String> box = (JComboBox<String>) e.getSource();
-                                String selectedItems = (String) box.getSelectedItem();
-                                if (selectedItems.equals("Add pattern")) {
+                                String selectedItem = (String) box.getSelectedItem();
+                                if (selectedItem.equals("Add pattern")) {
                                         ArrayList<Pixel> patternToAdd = canvas.getPaintedPixels();
                                         System.out.println(patternToAdd);
                                         int[] bound = findBoundaries(patternToAdd);
                                         transformPattern(patternToAdd, bound);
-                                } else if (selectedItems.equals("Diehard")) {
-                                       ArrayList<Pixel> pattern =  GameOfLife.predefinedPatterns.get("Diehard");
-                                       canvas.setSelectedPattern(pattern);
-                                } else if (selectedItems.equals("None")) {
-                                        canvas.setSelectedPattern(null);
+                                } else {
+                                        ArrayList<Pixel> pattern = GameOfLife.predefinedPatterns.get(selectedItem);
+                                        canvas.setSelectedPattern(pattern);
                                 }
                         }
                 });
@@ -106,6 +110,8 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                 editable = !editable;
                         }
                 });
+                iterationsLabel = new JLabel("Iterations : 0");
+                JButton resetButton = new JButton("Reset");
                 JButton startButton = new JButton("Start");
                 startButton.addActionListener(
                                 new ActionListener() {
@@ -113,6 +119,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                 start();
                                                 stopOnDead.setEnabled(false);
                                                 allowEdits.setEnabled(false);
+                                                resetButton.setEnabled(false);
                                         }
                                 });
                 JButton stopButton = new JButton("Stop");
@@ -121,10 +128,17 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                 stop();
                                 stopOnDead.setEnabled(true);
                                 allowEdits.setEnabled(true);
-
+                                resetButton.setEnabled(true);
                         }
                 });
-                iterationsLabel = new JLabel("Iterations : 0");
+                resetButton.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                                status.setText("Not stated");
+                                iterationsLabel.setText("Iterations : 0");
+                                preDefinedPatternsBox.setSelectedIndex(0);
+                                reset = true;
+                        }
+                });
                 layout.setAutoCreateGaps(true);
                 layout.setHorizontalGroup(
                                 layout.createSequentialGroup()
@@ -132,6 +146,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                 .addComponent(alive_color_label)
                                                                 .addComponent(dead_color_label)
                                                                 .addComponent(startButton))
+                                                .addComponent(resetButton)
                                                 .addComponent(enableGrid)
                                                 .addComponent(gridLabel)
                                                 .addComponent(gridColorButton,
@@ -179,6 +194,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                 .addComponent(status)
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                                                                 .addComponent(startButton)
+                                                                .addComponent(resetButton)
                                                                 .addComponent(stopButton))
                                                 .addComponent(allowEdits)
                                                 .addComponent(stopOnDead)
@@ -239,7 +255,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                         int newPixelX = (pixel.getX() - measurements[0]) - (measurements[2] / 2);
                         int newPixelY = (pixel.getY() - measurements[1]) - (measurements[3] / 2);
                         transPixels.add(new Pixel(newPixelX, newPixelY, Color.WHITE));
-                        //System.out.println("add(new Pixel(" + newPixelX + "," + newPixelY + "," + " Color.WHITE))");
+                        System.out.println("add(new Pixel(" + newPixelX + "," + newPixelY + "," + " Color.WHITE));");
                         /*
                          * Die Hard
                          * (-3, 0)
@@ -257,6 +273,14 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
 
         public boolean isRunning() {
                 return running;
+        }
+
+        public boolean shouldReset() {
+                return reset;
+        }
+
+        public void resetDone() {
+                reset = false;
         }
 
         public boolean isEditable() {
