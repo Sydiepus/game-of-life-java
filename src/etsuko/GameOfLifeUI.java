@@ -33,6 +33,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
         private static boolean shouldStop = false;
         private static boolean gridEnabled;
         private static boolean reset = false;
+        public static boolean resize = false;
 
         private JLabel iterationsLabel;
         private JLabel status;
@@ -95,6 +96,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                 repaint();
                                 int width = ((Number) widthField.getValue()).intValue();
                                 canvas.changeWidth(width);
+                                resize = true;
                         }
                 });
                 heightField.addPropertyChangeListener("value", new PropertyChangeListener() {
@@ -102,6 +104,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                 repaint();
                                 int height = ((Number) heightField.getValue()).intValue();
                                 canvas.changeHeight(height);
+                                resize = true;
                         }
                 });
 

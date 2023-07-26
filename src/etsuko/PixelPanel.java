@@ -23,6 +23,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     private Color gridColor = Color.GRAY;
     private ArrayList<Pixel> selectedPattern = null;
     private boolean highlight = false;
+    private int scale = 20;
 
     PixelPanel(int width, int height) {
         super();
@@ -30,9 +31,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         canvasSize = new Dimension(width, height);
         initPixels();
         oldPixel = pixels[0][0];
-        setMinimumSize(new Dimension(width * 10, height * 10));
-        setMaximumSize(new Dimension(width * 10, height * 10));
-        setPreferredSize(new Dimension(width * 10, height * 10));
+        setPreferredSize(new Dimension(width * scale, height * scale));
         setVisible(true);
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -258,9 +257,9 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         } else if (width > oldWidth) {
             Pixel[][] newPixels = new Pixel[width][canvasSize.height];
             for (int i = 0; i < oldWidth; i++) {
-                System.arraycopy(pixels[i], 0, newPixels[i], 0, pixels.length);
+                System.arraycopy(pixels[i], 0, newPixels[i], 0, pixels[i].length);
             }
-            for (int i = oldWidth-1; i < width; i++) {
+            for (int i = oldWidth - 1; i < width; i++) {
                 for (int y = 0; y < canvasSize.height; y++) {
                     newPixels[i][y] = new Pixel(i, y, back);
                 }
@@ -275,9 +274,9 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         oldPixelY = 0;
         oldPixel = null;
         selectedPattern = null;
+        setPreferredSize(new Dimension(width * scale, canvasSize.height * scale));
         calculatePixelSize();
         repaint();
-        //setSize(width*10, canvasSize.height*10);
     }
 
     public void changeHeight(int height) {
@@ -289,7 +288,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
             Pixel[][] newPixels = new Pixel[canvasSize.width][height];
             for (int i = 0; i < canvasSize.width; i++) {
                 System.arraycopy(pixels[i], 0, newPixels[i], 0, pixels[i].length);
-                for (int y = oldHeight-1; y < height; y++) {
+                for (int y = oldHeight - 1; y < height; y++) {
                     newPixels[i][y] = new Pixel(i, y, back);
                 }
             }
@@ -303,6 +302,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         oldPixelY = 0;
         oldPixel = null;
         selectedPattern = null;
+        setPreferredSize(new Dimension(canvasSize.width * scale, height * scale));
         calculatePixelSize();
         repaint();
     }

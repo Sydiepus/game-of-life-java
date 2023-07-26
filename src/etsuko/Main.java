@@ -1,7 +1,8 @@
 package etsuko;
 
 import javax.swing.JFrame;
-import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 
 public class Main {
 
@@ -10,10 +11,21 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 500);
         frame.setTitle("Game of life");
+        frame.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
         PixelPanel canvas = new PixelPanel(40, 40);
         GameOfLifeUI gameUI = new GameOfLifeUI(canvas);
-        frame.add(gameUI, BorderLayout.WEST);
-        frame.add(canvas, BorderLayout.CENTER);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.FIRST_LINE_START;
+        frame.add(gameUI, c);
+        c.gridx = 1;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
+        c.anchor = GridBagConstraints.PAGE_START;
+        frame.add(canvas, c);
         GameOfLife game = null;
         Boolean firstCall = true;
         frame.pack();
@@ -48,12 +60,17 @@ public class Main {
                     canvas.addMouseMotionListener(canvas);
                     firstCall = true;
                 } else if (firstCall && !gameUI.isEditable()) {
-                    //canvas.drawPatternOfPatterns("G G T C T T C C C C A T", GameOfLife.predefinedPatterns,
-                    //        new int[] { 5, 5 }, true, -1,
-                    //        1);
+                    // canvas.drawPatternOfPatterns("G G T C T T C C C C A T",
+                    // GameOfLife.predefinedPatterns,
+                    // new int[] { 5, 5 }, true, -1,
+                    // 1);
                     canvas.removeMouseListener(canvas);
                     canvas.removeMouseMotionListener(canvas);
                     firstCall = false;
+                }
+                if (gameUI.resize) {
+                    gameUI.resize = false;
+                    frame.pack();
                 }
             }
             try {
