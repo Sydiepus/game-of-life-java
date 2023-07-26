@@ -2,6 +2,7 @@ package etsuko;
 
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
@@ -13,9 +14,12 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeListener;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Set;
 import java.awt.event.ItemEvent;
+import java.beans.PropertyChangeEvent;
 
 public class GameOfLifeUI extends JPanel implements ActionListener {
         private static Dimension colorButtonDimension = new Dimension(20, 20);
@@ -73,6 +77,33 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 a[b.size() + 1] = "Add pattern";
                 System.arraycopy(b.toArray(), 0, a, 1, b.size());
                 JComboBox<String> preDefinedPatternsBox = new JComboBox<>(a);
+                iterationsLabel = new JLabel("Iterations : 0");
+                JButton startButton = new JButton("Start");
+                JButton resetButton = new JButton("Reset");
+                JButton stopButton = new JButton("Stop");
+                JLabel canvasSizeLabel = new JLabel("canvas size : ");
+                NumberFormat number = NumberFormat.getNumberInstance();
+                JFormattedTextField widthField = new JFormattedTextField(number);
+                widthField.setValue(canvas.getCanvasSize().width);
+                widthField.setToolTipText("Width");
+                JFormattedTextField heightField = new JFormattedTextField(number);
+                heightField.setValue(canvas.getCanvasSize().height);
+                heightField.setToolTipText("Width");
+
+                widthField.addPropertyChangeListener("value", new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent e) {
+                                repaint();
+                                int width = ((Number) widthField.getValue()).intValue();
+                                canvas.changeWidth(width);
+                        }
+                });
+                heightField.addPropertyChangeListener("value", new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent e) {
+                                repaint();
+                                int height = ((Number) heightField.getValue()).intValue();
+                                canvas.changeHeight(height);
+                        }
+                });
 
                 preDefinedPatternsBox.addActionListener(new ActionListener() {
                         @SuppressWarnings("unchecked")
@@ -110,9 +141,6 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                 editable = !editable;
                         }
                 });
-                iterationsLabel = new JLabel("Iterations : 0");
-                JButton resetButton = new JButton("Reset");
-                JButton startButton = new JButton("Start");
                 startButton.addActionListener(
                                 new ActionListener() {
                                         public void actionPerformed(ActionEvent e) {
@@ -122,7 +150,6 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                 resetButton.setEnabled(false);
                                         }
                                 });
-                JButton stopButton = new JButton("Stop");
                 stopButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                                 stop();
@@ -142,19 +169,23 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 layout.setAutoCreateGaps(true);
                 layout.setHorizontalGroup(
                                 layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                .addComponent(canvasSizeLabel)
                                                                 .addComponent(alive_color_label)
                                                                 .addComponent(dead_color_label)
-                                                                .addComponent(startButton))
-                                                .addComponent(resetButton)
-                                                .addComponent(enableGrid)
-                                                .addComponent(gridLabel)
-                                                .addComponent(gridColorButton,
-                                                                GroupLayout.PREFERRED_SIZE,
-                                                                GroupLayout.DEFAULT_SIZE,
-                                                                GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(status)
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                                                .addComponent(enableGrid)
+                                                                .addComponent(gridLabel)
+                                                                .addComponent(startButton)
+                                                                .addComponent(iterationsLabel)
+                                                                .addComponent(allowEdits)
+                                                                .addComponent(preDefinedPatternsBox)
+
+                                                )
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                .addComponent(widthField,
+                                                                                GroupLayout.PREFERRED_SIZE,
+                                                                                GroupLayout.DEFAULT_SIZE,
+                                                                                GroupLayout.PREFERRED_SIZE)
                                                                 .addComponent(alive_color_picker,
                                                                                 GroupLayout.PREFERRED_SIZE,
                                                                                 GroupLayout.DEFAULT_SIZE,
@@ -163,43 +194,68 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                                 GroupLayout.PREFERRED_SIZE,
                                                                                 GroupLayout.DEFAULT_SIZE,
                                                                                 GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(gridColorButton,
+                                                                                GroupLayout.PREFERRED_SIZE,
+                                                                                GroupLayout.DEFAULT_SIZE,
+                                                                                GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(resetButton)
+                                                                .addComponent(stopOnDead)
+                                                                .addComponent(status))
+                                                .addComponent(heightField,
+                                                                GroupLayout.PREFERRED_SIZE,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                GroupLayout.PREFERRED_SIZE)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                                 .addComponent(stopButton))
-                                                .addComponent(allowEdits)
-                                                .addComponent(stopOnDead)
-                                                .addComponent(iterationsLabel)
-                                                .addComponent(preDefinedPatternsBox)
 
                 );
                 layout.setVerticalGroup(
                                 layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                .addComponent(canvasSizeLabel)
+                                                                .addComponent(widthField,
+                                                                                GroupLayout.PREFERRED_SIZE,
+                                                                                GroupLayout.DEFAULT_SIZE,
+                                                                                GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(heightField,
+                                                                                GroupLayout.PREFERRED_SIZE,
+                                                                                GroupLayout.DEFAULT_SIZE,
+                                                                                GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                                 .addComponent(alive_color_label)
                                                                 .addComponent(alive_color_picker,
                                                                                 GroupLayout.PREFERRED_SIZE,
                                                                                 GroupLayout.DEFAULT_SIZE,
                                                                                 GroupLayout.PREFERRED_SIZE))
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                                 .addComponent(dead_color_label)
                                                                 .addComponent(dead_color_picker,
                                                                                 GroupLayout.PREFERRED_SIZE,
                                                                                 GroupLayout.DEFAULT_SIZE,
                                                                                 GroupLayout.PREFERRED_SIZE))
-                                                .addComponent(enableGrid)
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                                                .addComponent(enableGrid))
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                                 .addComponent(gridLabel)
                                                                 .addComponent(gridColorButton,
                                                                                 GroupLayout.PREFERRED_SIZE,
                                                                                 GroupLayout.DEFAULT_SIZE,
                                                                                 GroupLayout.PREFERRED_SIZE))
-                                                .addComponent(status)
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                .addComponent(status)
+                                                                .addComponent(iterationsLabel))
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                                 .addComponent(startButton)
                                                                 .addComponent(resetButton)
                                                                 .addComponent(stopButton))
-                                                .addComponent(allowEdits)
-                                                .addComponent(stopOnDead)
-                                                .addComponent(iterationsLabel)
-                                                .addComponent(preDefinedPatternsBox)
+
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                .addComponent(allowEdits)
+                                                                .addComponent(stopOnDead))
+                                                .addComponent(preDefinedPatternsBox,
+                                                                GroupLayout.PREFERRED_SIZE,
+                                                                GroupLayout.DEFAULT_SIZE,
+                                                                GroupLayout.PREFERRED_SIZE)
 
                 );
 

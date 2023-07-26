@@ -207,22 +207,104 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     }
 
     public void drawPatternOfPatterns(String patternOfPattern, HashMap<String, ArrayList<Pixel>> patterns, int[] offset,
-            boolean wrap, int repeat) {
-        // patternOfPattern is a string containing the pattern, a pattern should be
-        // available in patterns else it i'll be considered like a space.
+            boolean wrap, int repeat, int spacing) {
+        // patternOfPattern is a string containing the pattern to be drawn in order
+        // separated by spaces, a pattern should be available in patterns else it i'll
+        // be considered like a space.
         // a space is a ... space between the current and the next pattern.
         // The ArrayList should contain the pixels of the pattern that should be
         // painted, the coordinates of the pixels should be relative to
         // a fictional center as in the center of the smallest rectangle that contains
         // all the pixels
         // offset are the coordinates of the center that you want, e.g if a pattern is
-        // 5x5 wide you'ld want an offset of +5, +5 so all the pattern would be painted
+        // 5x5 wide you'ld want an offset of +5, +5 so the pattern would be painted
         // correctly.
         // wrap is used to determine if the pattern should bet painted on the next
         // "line" if it doesn't fit.
         // repeat number of times to repeat pattern, negative means infinite, aka fill
         // the whole canvas.
-        // TODO : implement this.
+        // spacing is how much pixels to leave between the patterns
+        highlight = false;
+        int centerX = offset[0] / 2;
+        int centerY = offset[1] / 2;
+        int i = 0;
+        while (i < repeat | repeat < 0) {
+            for (String pattern : patternOfPattern.split(" ")) {
+                if (centerX > canvasSize.width && wrap) {
+                    centerX = offset[0] / 2;
+                    centerY += spacing + offset[1];
+                }
+                if (centerY > canvasSize.height) {
+                    selectedPattern = null;
+                    return;
+                }
+                selectedPattern = patterns.get(pattern);
+                if (selectedPattern != null) {
+                    System.out.println("Drawing : " + pattern);
+                    handlePattern(centerX, centerY);
+                }
+                centerX += spacing + offset[0];
+            }
+            i++;
+        }
+        selectedPattern = null;
+    }
+
+    public void changeWidth(int width) {
+        int oldWidth = canvasSize.width;
+        canvasSize.setSize(width, canvasSize.height);
+        if (width == oldWidth) {
+            return;
+        } else if (width > oldWidth) {
+            Pixel[][] newPixels = new Pixel[width][canvasSize.height];
+            for (int i = 0; i < oldWidth; i++) {
+                System.arraycopy(pixels[i], 0, newPixels[i], 0, pixels.length);
+            }
+            for (int i = oldWidth-1; i < width; i++) {
+                for (int y = 0; y < canvasSize.height; y++) {
+                    newPixels[i][y] = new Pixel(i, y, back);
+                }
+            }
+            pixels = newPixels;
+        } else {
+            Pixel[][] newPixels = new Pixel[width][canvasSize.height];
+            pixels = newPixels;
+            initPixels();
+        }
+        oldPixelX = 0;
+        oldPixelY = 0;
+        oldPixel = null;
+        selectedPattern = null;
+        calculatePixelSize();
+        repaint();
+        //setSize(width*10, canvasSize.height*10);
+    }
+
+    public void changeHeight(int height) {
+        int oldHeight = canvasSize.height;
+        canvasSize.setSize(canvasSize.width, height);
+        if (height == oldHeight) {
+            return;
+        } else if (height > oldHeight) {
+            Pixel[][] newPixels = new Pixel[canvasSize.width][height];
+            for (int i = 0; i < canvasSize.width; i++) {
+                System.arraycopy(pixels[i], 0, newPixels[i], 0, pixels[i].length);
+                for (int y = oldHeight-1; y < height; y++) {
+                    newPixels[i][y] = new Pixel(i, y, back);
+                }
+            }
+            pixels = newPixels;
+        } else {
+            Pixel[][] newPixels = new Pixel[canvasSize.width][height];
+            pixels = newPixels;
+            initPixels();
+        }
+        oldPixelX = 0;
+        oldPixelY = 0;
+        oldPixel = null;
+        selectedPattern = null;
+        calculatePixelSize();
+        repaint();
     }
 
     private int calculatePixelSize() {

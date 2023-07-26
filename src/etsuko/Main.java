@@ -8,15 +8,16 @@ public class Main {
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
+        frame.setSize(800, 500);
         frame.setTitle("Game of life");
-        frame.setVisible(true);
-        PixelPanel canvas = new PixelPanel(137, 77);
+        PixelPanel canvas = new PixelPanel(40, 40);
         GameOfLifeUI gameUI = new GameOfLifeUI(canvas);
         frame.add(gameUI, BorderLayout.WEST);
         frame.add(canvas, BorderLayout.CENTER);
         GameOfLife game = null;
         Boolean firstCall = true;
+        frame.pack();
+        frame.setVisible(true);
         while (true) {
             if (gameUI.shouldReset()) {
                 if (game != null) {
@@ -47,6 +48,9 @@ public class Main {
                     canvas.addMouseMotionListener(canvas);
                     firstCall = true;
                 } else if (firstCall && !gameUI.isEditable()) {
+                    //canvas.drawPatternOfPatterns("G G T C T T C C C C A T", GameOfLife.predefinedPatterns,
+                    //        new int[] { 5, 5 }, true, -1,
+                    //        1);
                     canvas.removeMouseListener(canvas);
                     canvas.removeMouseMotionListener(canvas);
                     firstCall = false;
