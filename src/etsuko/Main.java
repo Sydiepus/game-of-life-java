@@ -58,7 +58,7 @@ public class Main {
                 gameUI.resetDone();
             }
             if (gameUI.isRunning()) {
-                if (game == null || gameUI.isEditable()) {
+                if (game == null || gameUI.isEditable() || canvas.deletedPixels()) {
                     game = new GameOfLife(canvas);
                 }
                 if (firstCall) {

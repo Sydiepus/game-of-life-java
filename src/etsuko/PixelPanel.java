@@ -26,6 +26,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     private int scale = 9;
     private static int centerX = -1;
     private static int centerY = -1;
+    private static boolean deleted = false;
 
     PixelPanel(int width, int height) {
         super();
@@ -254,7 +255,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
                     centerX = (offset[0] / 2) + padding[2];
                     centerY += spacing + offset[1];
                 }
-                if (centerY > canvasSize.height) {
+                if (centerY > canvasSize.height - padding[1]) {
                     selectedPattern = null;
                     return;
                 }
@@ -355,6 +356,10 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         return gridColor;
     }
 
+    public boolean deletedPixels() {
+        return deleted;
+    }
+
     public void setEnableGrid(boolean enable) {
         pixelGrid = enable;
         repaint();
@@ -378,7 +383,9 @@ public class PixelPanel extends JPanel implements MouseInputListener {
                     drawPixel(pixelX, pixelY);
                 }
                 selected_color = oldSelectedColor;
+                deleted = true;
             } else {
+                deleted = false;
                 if (selectedPattern != null) {
                     handlePattern(pixelX, pixelY);
                 } else {
@@ -436,7 +443,9 @@ public class PixelPanel extends JPanel implements MouseInputListener {
                     drawPixel(pixelX, pixelY);
                 }
                 selected_color = oldSelectedColor;
+                deleted = true;
             } else {
+                deleted = false;
                 if (selectedPattern != null) {
                     handlePattern(pixelX, pixelY);
                 } else {
