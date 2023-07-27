@@ -28,12 +28,14 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
         private JLabel dead_color_label;
         private JButton dead_color_picker;
         private PixelPanel canvas;
+        private JFormattedTextField scaleField;
         private static boolean running = false;
         private static boolean editable = false;
         private static boolean shouldStop = false;
         private static boolean gridEnabled;
         private static boolean reset = false;
-        public static boolean resize = false;
+        private static boolean resize = false;
+        private static boolean etsukoModeActivated = false;
 
         private JLabel iterationsLabel;
         private JLabel status;
@@ -48,7 +50,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 setVisible(true);
                 alive_color_label = new JLabel("Alive color : ");
                 alive_color_picker = new JButton();
-                alive_color_picker.setToolTipText("Alive cells");
+                alive_color_picker.setToolTipText("Alive cells, to delete hold control down.");
                 alive_color_picker.setPreferredSize(colorButtonDimension);
                 alive_color_picker.setBackground(canvas.getSelectedColor());
                 dead_color_label = new JLabel("Dead color : ");
@@ -90,6 +92,95 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 JFormattedTextField heightField = new JFormattedTextField(number);
                 heightField.setValue(canvas.getCanvasSize().height);
                 heightField.setToolTipText("Width");
+                JLabel scaleLabel = new JLabel("Scale : ");
+                scaleField = new JFormattedTextField(number);
+                scaleField.setValue(canvas.getScale());
+                JCheckBox etsukoMode = new JCheckBox("Etsuko mode", etsukoModeActivated);
+
+                etsukoMode.addItemListener(new ItemListener() {
+                        public void itemStateChanged(ItemEvent e) {
+                                etsukoModeActivated = !etsukoModeActivated;
+                                int width = 142;
+                                int height = 80;
+                                // int height = 86;
+                                if (etsukoModeActivated) {
+                                        widthField.setValue(width);
+                                        widthField.repaint();
+                                        widthField.setEnabled(false);
+                                        heightField.setValue(height);
+                                        heightField.repaint();
+                                        heightField.setEnabled(false);
+                                        canvas.changeWidth(width);
+                                        canvas.changeHeight(height);
+                                        resize = true;
+                                        scaleField.setValue(9);
+                                        canvas.setScale(9);
+                                        scaleField.setEnabled(false);
+                                        // change Alive color to c8ded2
+                                        Color etsukoAlive = new Color(200, 222, 210);
+                                        Color etsukoDead = new Color(0, 3, 7);
+                                        Color etsukoGrid = new Color(49, 88, 75);
+                                        alive_color_picker.setBackground(etsukoAlive);
+                                        alive_color_picker.setEnabled(false);
+                                        canvas.setSelectedColor(etsukoAlive);
+                                        dead_color_picker.setBackground(etsukoDead);
+                                        dead_color_picker.setEnabled(false);
+                                        canvas.setBack(etsukoDead);
+                                        enableGrid.setSelected(true);
+                                        enableGrid.setEnabled(false);
+                                        gridColorButton.setBackground(etsukoGrid);
+                                        gridColorButton.setEnabled(false);
+                                        resetButton.setEnabled(false);
+                                        allowEdits.setSelected(false);
+                                        editable = false;
+                                        allowEdits.setEnabled(false);
+                                        preDefinedPatternsBox.setEnabled(false);
+                                        // GGTCTTCCCCAT{8}TCTTCTGGAGGA{2}TCTTCTTTGGGT{1}
+                                        // TCTTCTGGAGGCGGTCTTCCCCATGGTCTTCCCCATCTTCTTCTTCTT
+                                        // GGT{4}ATTCTTCTTCTCGGTGGTCCCACT GGTCTTCCCCAT{5}
+                                        // offset
+                                        int[] offset = new int[] { 5, 5 };
+                                        int[] padding = new int[] { 4, 5, 2, 3 };
+                                        canvas.drawPatternOfPatterns("G G T C T T C C C C A T",
+                                                        GameOfLife.predefinedPatterns, offset, true, 8, 1, padding);
+                                        canvas.drawPatternOfPatterns("T C T T C T G G A G G A",
+                                                        GameOfLife.predefinedPatterns, offset, true, 2, 1, padding);
+                                        canvas.drawPatternOfPatterns("T C T T C T T T G G G T",
+                                                        GameOfLife.predefinedPatterns, offset, true, 1, 1, padding);
+                                        canvas.drawPatternOfPatterns(
+                                                        "T C T T C T G G A G G C G G T C T T C C C C A T G G T C T T C C C C A T C T T C T T C T T C T T",
+                                                        GameOfLife.predefinedPatterns, offset, true, 1, 1, padding);
+                                        canvas.drawPatternOfPatterns("G G T", GameOfLife.predefinedPatterns, offset,
+                                                        true, 4, 1, padding);
+                                        canvas.drawPatternOfPatterns("A T T C T T C T T C T C G G T G G T C C C A C T",
+                                                        GameOfLife.predefinedPatterns, offset, true, 1, 1, padding);
+                                        canvas.drawPatternOfPatterns("G G T C T T C C C C A T",
+                                                        GameOfLife.predefinedPatterns, offset, true, 5, 1, padding);
+
+                                } else {
+                                        widthField.setEnabled(true);
+                                        heightField.setEnabled(true);
+                                        scaleField.setEnabled(true);
+                                        alive_color_picker.setEnabled(true);
+                                        dead_color_picker.setEnabled(true);
+                                        enableGrid.setEnabled(true);
+                                        gridColorButton.setEnabled(true);
+                                        resetButton.setEnabled(true);
+                                        allowEdits.setEnabled(true);
+                                        preDefinedPatternsBox.setEnabled(true);
+
+                                }
+                        }
+                });
+
+                scaleField.addPropertyChangeListener("value", new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent e) {
+                                repaint();
+                                int scale = ((Number) scaleField.getValue()).intValue();
+                                canvas.setScale(scale);
+                                resize = true;
+                        }
+                });
 
                 widthField.addPropertyChangeListener("value", new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent e) {
@@ -156,9 +247,11 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 stopButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                                 stop();
-                                stopOnDead.setEnabled(true);
-                                allowEdits.setEnabled(true);
-                                resetButton.setEnabled(true);
+                                if (!etsukoModeActivated) {
+                                        stopOnDead.setEnabled(true);
+                                        allowEdits.setEnabled(true);
+                                        resetButton.setEnabled(true);
+                                }
                         }
                 });
                 resetButton.addActionListener(new ActionListener() {
@@ -174,6 +267,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                 layout.createSequentialGroup()
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                                 .addComponent(canvasSizeLabel)
+                                                                .addComponent(scaleLabel)
                                                                 .addComponent(alive_color_label)
                                                                 .addComponent(dead_color_label)
                                                                 .addComponent(enableGrid)
@@ -182,10 +276,15 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                 .addComponent(iterationsLabel)
                                                                 .addComponent(allowEdits)
                                                                 .addComponent(preDefinedPatternsBox)
+                                                                .addComponent(etsukoMode)
 
                                                 )
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                                 .addComponent(widthField,
+                                                                                GroupLayout.PREFERRED_SIZE,
+                                                                                GroupLayout.DEFAULT_SIZE,
+                                                                                GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(scaleField,
                                                                                 GroupLayout.PREFERRED_SIZE,
                                                                                 GroupLayout.DEFAULT_SIZE,
                                                                                 GroupLayout.PREFERRED_SIZE)
@@ -225,6 +324,12 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                                 GroupLayout.DEFAULT_SIZE,
                                                                                 GroupLayout.PREFERRED_SIZE))
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                .addComponent(scaleLabel)
+                                                                .addComponent(scaleField,
+                                                                                GroupLayout.PREFERRED_SIZE,
+                                                                                GroupLayout.DEFAULT_SIZE,
+                                                                                GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                                 .addComponent(alive_color_label)
                                                                 .addComponent(alive_color_picker,
                                                                                 GroupLayout.PREFERRED_SIZE,
@@ -259,6 +364,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                                                 GroupLayout.PREFERRED_SIZE,
                                                                 GroupLayout.DEFAULT_SIZE,
                                                                 GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(etsukoMode)
 
                 );
 
@@ -362,5 +468,17 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
         public void start() {
                 running = true;
                 status.setText("Running");
+        }
+
+        public boolean resized() {
+                boolean ret = resize;
+                if (resize) {
+                        resize = false;
+                }
+                return ret;
+        }
+
+        public void changeScaleField(int scale) {
+                scaleField.setValue(scale);
         }
 }

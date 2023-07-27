@@ -3,6 +3,8 @@ package etsuko;
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.MouseWheelEvent;
 
 public class Main {
 
@@ -15,6 +17,22 @@ public class Main {
         GridBagConstraints c = new GridBagConstraints();
         PixelPanel canvas = new PixelPanel(40, 40);
         GameOfLifeUI gameUI = new GameOfLifeUI(canvas);
+        canvas.addMouseWheelListener(new MouseWheelListener() {
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int scale = canvas.getScale();
+                if (e.getWheelRotation() < 0) {
+                    // Up
+                    canvas.setScale(scale + 1);
+                } else {
+                    // Down
+                    canvas.setScale(scale - 1);
+                }
+                frame.pack();
+                gameUI.changeScaleField(scale);
+            }
+        });
         c.gridx = 0;
         c.gridy = 0;
         c.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -60,16 +78,11 @@ public class Main {
                     canvas.addMouseMotionListener(canvas);
                     firstCall = true;
                 } else if (firstCall && !gameUI.isEditable()) {
-                    // canvas.drawPatternOfPatterns("G G T C T T C C C C A T",
-                    // GameOfLife.predefinedPatterns,
-                    // new int[] { 5, 5 }, true, -1,
-                    // 1);
                     canvas.removeMouseListener(canvas);
                     canvas.removeMouseMotionListener(canvas);
                     firstCall = false;
                 }
-                if (gameUI.resize) {
-                    gameUI.resize = false;
+                if (gameUI.resized()) {
                     frame.pack();
                 }
             }

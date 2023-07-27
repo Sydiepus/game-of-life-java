@@ -23,7 +23,9 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     private Color gridColor = Color.GRAY;
     private ArrayList<Pixel> selectedPattern = null;
     private boolean highlight = false;
-    private int scale = 20;
+    private int scale = 9;
+    private static int centerX = -1;
+    private static int centerY = -1;
 
     PixelPanel(int width, int height) {
         super();
@@ -101,11 +103,27 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         oldPixelY = 0;
         oldPixel = null;
         selectedPattern = null;
+        scale = 9;
+        centerX = -1;
+        centerY = -1;
         repaint();
     }
 
     public Dimension getCanvasSize() {
         return canvasSize;
+    }
+
+    public int getScale() {
+        return scale;
+    }
+
+    public void setScale(int scale) {
+        if (scale <= 0) {
+            scale = 1;
+        }
+        this.scale = scale;
+        setPreferredSize(new Dimension(canvasSize.width * scale, canvasSize.height * scale));
+        repaint();
     }
 
     public ArrayList<Pixel> getPaintedPixels() {
@@ -206,7 +224,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     }
 
     public void drawPatternOfPatterns(String patternOfPattern, HashMap<String, ArrayList<Pixel>> patterns, int[] offset,
-            boolean wrap, int repeat, int spacing) {
+            boolean wrap, int repeat, int spacing, int[] padding) {
         // patternOfPattern is a string containing the pattern to be drawn in order
         // separated by spaces, a pattern should be available in patterns else it i'll
         // be considered like a space.
@@ -223,14 +241,17 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         // repeat number of times to repeat pattern, negative means infinite, aka fill
         // the whole canvas.
         // spacing is how much pixels to leave between the patterns
+        // padding [UP, DOWN, LEFT, RIGHT]
         highlight = false;
-        int centerX = offset[0] / 2;
-        int centerY = offset[1] / 2;
-        int i = 0;
-        while (i < repeat | repeat < 0) {
+        if (centerX == -1 && centerY == -1) {
+            centerX = (offset[0] / 2) + padding[2];
+            centerY = (offset[1] / 2) + padding[0];
+        }
+        int i = 1;
+        while (i <= repeat | repeat < 0) {
             for (String pattern : patternOfPattern.split(" ")) {
-                if (centerX > canvasSize.width && wrap) {
-                    centerX = offset[0] / 2;
+                if (centerX > canvasSize.width - padding[3] && wrap) {
+                    centerX = (offset[0] / 2) + padding[2];
                     centerY += spacing + offset[1];
                 }
                 if (centerY > canvasSize.height) {
@@ -275,7 +296,6 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         oldPixel = null;
         selectedPattern = null;
         setPreferredSize(new Dimension(width * scale, canvasSize.height * scale));
-        calculatePixelSize();
         repaint();
     }
 
@@ -303,7 +323,6 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         oldPixel = null;
         selectedPattern = null;
         setPreferredSize(new Dimension(canvasSize.width * scale, height * scale));
-        calculatePixelSize();
         repaint();
     }
 
@@ -350,10 +369,21 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         try {
             int pixelX = normalize_x(e.getX());
             int pixelY = normalize_y(e.getY());
-            if (selectedPattern != null) {
-                handlePattern(pixelX, pixelY);
+            if (e.isControlDown()) {
+                Color oldSelectedColor = selected_color;
+                selected_color = back;
+                if (selectedPattern != null) {
+                    handlePattern(pixelX, pixelY);
+                } else {
+                    drawPixel(pixelX, pixelY);
+                }
+                selected_color = oldSelectedColor;
             } else {
-                drawPixel(pixelX, pixelY);
+                if (selectedPattern != null) {
+                    handlePattern(pixelX, pixelY);
+                } else {
+                    drawPixel(pixelX, pixelY);
+                }
             }
         } catch (OutOfBoundsException ex) {
         }
@@ -397,10 +427,21 @@ public class PixelPanel extends JPanel implements MouseInputListener {
                 return;
             }
             handleOldStuff();
-            if (selectedPattern != null) {
-                handlePattern(pixelX, pixelY);
+            if (e.isControlDown()) {
+                Color oldSelectedColor = selected_color;
+                selected_color = back;
+                if (selectedPattern != null) {
+                    handlePattern(pixelX, pixelY);
+                } else {
+                    drawPixel(pixelX, pixelY);
+                }
+                selected_color = oldSelectedColor;
             } else {
-                drawPixel(pixelX, pixelY);
+                if (selectedPattern != null) {
+                    handlePattern(pixelX, pixelY);
+                } else {
+                    drawPixel(pixelX, pixelY);
+                }
             }
             oldPixelX = pixelX;
             oldPixelY = pixelY;
