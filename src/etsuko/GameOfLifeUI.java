@@ -76,7 +76,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 stopOnDead.setToolTipText("Stop when there is no cells alive.");
                 Set<String> b = GameOfLife.predefinedPatterns.keySet();
                 String[] a = new String[b.size() + 2];
-                a[0] = "None";
+                a[0] = "Select pattern";
                 a[b.size() + 1] = "Add pattern";
                 System.arraycopy(b.toArray(), 0, a, 1, b.size());
                 JComboBox<String> preDefinedPatternsBox = new JComboBox<>(a);
@@ -206,7 +206,10 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                 String selectedItem = (String) box.getSelectedItem();
                                 if (selectedItem.equals("Add pattern")) {
                                         ArrayList<Pixel> patternToAdd = canvas.getPaintedPixels();
-                                        System.out.println(patternToAdd);
+                                        if (patternToAdd.isEmpty()) {
+                                                preDefinedPatternsBox.setSelectedIndex(0);
+                                                return;
+                                        }
                                         int[] bound = findBoundaries(patternToAdd);
                                         transformPattern(patternToAdd, bound);
                                 } else {
@@ -386,6 +389,9 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
         };
 
         private int[] findBoundaries(ArrayList<Pixel> pixels) {
+                // lowX, lowY, deltaX, deltaY
+                // transform the Pattern into a rectangle with pixels relative to the center of
+                // the rectangle.
                 Pixel pix = pixels.get(0);
                 int highX, highY, lowX, lowY;
                 highX = lowX = pix.getX();
@@ -411,29 +417,13 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
         }
 
         private void transformPattern(ArrayList<Pixel> pixels, int[] measurements) {
-                // lowX, lowY, deltaX, deltaY
-                // transform the Pattern into a rectangle with pixels relative to the center of
-                // the rectangle.
-                ArrayList<Pixel> transPixels = new ArrayList<Pixel>();
-                System.out.println("Center X: " + (measurements[2]) / 2 + " Y: " + (measurements[3]) / 2);
                 for (Pixel pixel : pixels) {
                         int newPixelX = (pixel.getX() - measurements[0]) - (measurements[2] / 2);
                         int newPixelY = (pixel.getY() - measurements[1]) - (measurements[3] / 2);
-                        transPixels.add(new Pixel(newPixelX, newPixelY, Color.WHITE));
                         System.out.println("add(new Pixel(" + newPixelX + "," + newPixelY + "," + " Color.WHITE));");
-                        /*
-                         * Die Hard
-                         * (-3, 0)
-                         * (-2, 0)
-                         * (-2, 1)
-                         * (2, 1)
-                         * (3, -1)
-                         * (3, 1)
-                         * (4, 1)
-                         */
-                        // TODO: Complete this.
-
                 }
+                System.out.println(
+                                "Copy these into GameOfLife predefined patterns following the syntax already available.");
         }
 
         public boolean isRunning() {
