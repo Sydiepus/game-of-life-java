@@ -320,6 +320,7 @@ public class GameOfLife {
         canvas_width = canvas.getCanvasSize().width;
         canvas_height = canvas.getCanvasSize().height;
         initAliveCells();
+        canStop = false;
     }
 
     private void initAliveCells() {
