@@ -17,15 +17,11 @@ jobs:
           distribution: "temurin"
           java-version: "11"
 
-      - name: Compile
-        run: |
-          cd src 
-          javac etsuko/*.java
+      - name: Compile into classes
+        run: javac -d classes/ -g:none src/etsuko/*.java
 
       - name: Package into jar
-        run: |
-         cd src
-         jar cfe game-of-life-java.jar etsuko.Main etsuko/*.class
+        run: jar cfe game-of-life-java.jar etsuko.Main -C classes/ etsuko
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
