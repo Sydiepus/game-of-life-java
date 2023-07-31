@@ -23,7 +23,9 @@ jobs:
           javac etsuko/*.java
 
       - name: Package into jar
-        run: jar cfe game-of-life-java.jar etsuko.Main etsuko/*.class
+        run: |
+         cd src
+         jar cfe game-of-life-java.jar etsuko.Main etsuko/*.class
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
