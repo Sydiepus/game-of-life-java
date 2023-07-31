@@ -23,11 +23,9 @@ jobs:
       - name: Package into jar
         run: jar cfe game-of-life-java.jar etsuko.Main src/etsuko/*.class
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          files: game-of-life-java.jar
-          tag_name: ${{ github.ref }}
-          body: |
-            Release ${{ github.ref }}
-            Commit ${{ github.sha }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: game-of-life-java.jar
+          tag: ${{ github.ref }}
