@@ -129,6 +129,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                         enableGrid.setSelected(true);
                                         enableGrid.setEnabled(false);
                                         gridColorButton.setBackground(etsukoGrid);
+                                        canvas.setGridColor(etsukoGrid);
                                         gridColorButton.setEnabled(false);
                                         resetButton.setEnabled(false);
                                         allowEdits.setSelected(false);

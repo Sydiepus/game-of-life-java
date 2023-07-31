@@ -261,7 +261,6 @@ public class PixelPanel extends JPanel implements MouseInputListener {
                 }
                 selectedPattern = patterns.get(pattern);
                 if (selectedPattern != null) {
-                    System.out.println("Drawing : " + pattern);
                     handlePattern(centerX, centerY);
                 }
                 centerX += spacing + offset[0];
