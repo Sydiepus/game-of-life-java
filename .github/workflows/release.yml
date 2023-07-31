@@ -1,7 +1,7 @@
 name: release
 
 permissions:
-    contents: write
+  contents: write
 on:
   release:
     types: [published]
@@ -18,10 +18,12 @@ jobs:
           java-version: "11"
 
       - name: Compile
-        run: javac src/etsuko/*.java
+        run: |
+          cd src 
+          javac etsuko/*.java
 
       - name: Package into jar
-        run: jar cfe game-of-life-java.jar etsuko.Main src/etsuko/*.class
+        run: jar cfe game-of-life-java.jar etsuko.Main etsuko/*.class
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
