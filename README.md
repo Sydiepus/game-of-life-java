@@ -7,7 +7,9 @@
 
 ## Example usage
 
-![Usage video showcase](./assests/Example%20Usage.mp4)
+
+https://github.com/Sydiepus/game-of-life-java/assets/49863809/d7782aa1-ba3d-46e7-a603-751aa555bb9a
+
 
 ## Motivation
 - I wanted to learn java, and I stumbled across this video [Etsuko Yakushimaru - “I’m Humanity”](https://www.youtube.com/watch?v=92Dcp9Fbdac) which I found really fascinating and wanted to recreate it.
