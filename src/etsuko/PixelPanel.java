@@ -21,7 +21,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     private static Pixel oldPixel = null;
     private static boolean pixelGrid = false;
     private Color gridColor = Color.GRAY;
-    private ArrayList<Pixel> selectedPattern = null;
+    private ArrayList<int[]> selectedPattern = null;
     private boolean highlight = false;
     private int scale = 9;
     private static int centerX = -1;
@@ -169,17 +169,17 @@ public class PixelPanel extends JPanel implements MouseInputListener {
     }
 
     private void handlePattern(int pixel_x, int pixel_y) {
-        for (Pixel pixel : selectedPattern) {
-            int tmpX = pixel.getX() + pixel_x;
-            int tmpY = pixel.getY() + pixel_y;
+        for (int[] coor : selectedPattern) {
+            int tmpX = coor[0] + pixel_x;
+            int tmpY = coor[1] + pixel_y;
             drawPixel(tmpX, tmpY);
         }
     }
 
     private void handleOldPattern() {
-        for (Pixel pixel : selectedPattern) {
+        for (int[] coor : selectedPattern) {
             try {
-                Pixel oldPixel = getPixel(pixel.getX() + oldPixelX, pixel.getY() + oldPixelY);
+                Pixel oldPixel = getPixel(coor[0] + oldPixelX, coor[1] + oldPixelY);
                 drawPixel(oldPixel, getGraphics());
             } catch (IndexOutOfBoundsException ex) {
             }
@@ -224,7 +224,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         }
     }
 
-    public void drawPatternOfPatterns(String patternOfPattern, HashMap<String, ArrayList<Pixel>> patterns, int[] offset,
+    public void drawPatternOfPatterns(String patternOfPattern, HashMap<String, ArrayList<int[]>> patterns, int[] offset,
             boolean wrap, int repeat, int spacing, int[] padding) {
         // patternOfPattern is a string containing the pattern to be drawn in order
         // separated by spaces, a pattern should be available in patterns else it i'll
@@ -330,7 +330,7 @@ public class PixelPanel extends JPanel implements MouseInputListener {
         return Math.min(getWidth(), getHeight()) / Math.min(canvasSize.width, canvasSize.height);
     }
 
-    public void setSelectedPattern(ArrayList<Pixel> selectedPattern) {
+    public void setSelectedPattern(ArrayList<int[]> selectedPattern) {
         this.selectedPattern = selectedPattern;
     }
 

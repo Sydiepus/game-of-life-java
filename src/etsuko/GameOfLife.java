@@ -5,8 +5,6 @@ import java.util.HashMap;
 
 import javax.swing.JLabel;
 
-import java.awt.Color;
-
 public class GameOfLife {
     private ArrayList<Pixel> alive_cells;
     private PixelPanel canvas;
@@ -14,301 +12,301 @@ public class GameOfLife {
     private static int canvas_width;
     private static int canvas_height;
     private boolean canStop = false;
-    public static final HashMap<String, ArrayList<Pixel>> predefinedPatterns = new HashMap<String, ArrayList<Pixel>>() {
+    public static final HashMap<String, ArrayList<int[]>> predefinedPatterns = new HashMap<String, ArrayList<int[]>>() {
         {
-            put("Diehard", new ArrayList<Pixel>() {
+            put("Diehard", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-3, 0, Color.WHITE));
-                    add(new Pixel(-2, 0, Color.WHITE));
-                    add(new Pixel(-2, 1, Color.WHITE));
-                    add(new Pixel(2, 1, Color.WHITE));
-                    add(new Pixel(3, -1, Color.WHITE));
-                    add(new Pixel(3, 1, Color.WHITE));
-                    add(new Pixel(4, 1, Color.WHITE));
+                    add(new int[] { -3, 0 });
+                    add(new int[] { -2, 0 });
+                    add(new int[] { -2, 1 });
+                    add(new int[] { 2, 1 });
+                    add(new int[] { 3, -1 });
+                    add(new int[] { 3, 1 });
+                    add(new int[] { 4, 1 });
                 }
             });
-            put("T", new ArrayList<Pixel>() {
+            put("T", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-2, -2, Color.WHITE));
-                    add(new Pixel(-1, -2, Color.WHITE));
-                    add(new Pixel(0, -2, Color.WHITE));
-                    add(new Pixel(0, -1, Color.WHITE));
-                    add(new Pixel(0, 0, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(0, 2, Color.WHITE));
-                    add(new Pixel(1, -2, Color.WHITE));
-                    add(new Pixel(2, -2, Color.WHITE));
+                    add(new int[] { -2, -2 });
+                    add(new int[] { -1, -2 });
+                    add(new int[] { 0, -2 });
+                    add(new int[] { 0, -1 });
+                    add(new int[] { 0, 0 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 0, 2 });
+                    add(new int[] { 1, -2 });
+                    add(new int[] { 2, -2 });
                 }
             });
-            put("C", new ArrayList<Pixel>() {
+            put("C", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-2, -1, Color.WHITE));
-                    add(new Pixel(-2, 0, Color.WHITE));
-                    add(new Pixel(-2, 1, Color.WHITE));
-                    add(new Pixel(-1, -2, Color.WHITE));
-                    add(new Pixel(-1, 2, Color.WHITE));
-                    add(new Pixel(0, -2, Color.WHITE));
-                    add(new Pixel(0, 2, Color.WHITE));
-                    add(new Pixel(1, -2, Color.WHITE));
-                    add(new Pixel(1, 2, Color.WHITE));
-                    add(new Pixel(2, -2, Color.WHITE));
-                    add(new Pixel(2, 2, Color.WHITE));
+                    add(new int[] { -2, -1 });
+                    add(new int[] { -2, 0 });
+                    add(new int[] { -2, 1 });
+                    add(new int[] { -1, -2 });
+                    add(new int[] { -1, 2 });
+                    add(new int[] { 0, -2 });
+                    add(new int[] { 0, 2 });
+                    add(new int[] { 1, -2 });
+                    add(new int[] { 1, 2 });
+                    add(new int[] { 2, -2 });
+                    add(new int[] { 2, 2 });
                 }
             });
-            put("A", new ArrayList<Pixel>() {
+            put("A", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-2, -1, Color.WHITE));
-                    add(new Pixel(-2, 0, Color.WHITE));
-                    add(new Pixel(-2, 1, Color.WHITE));
-                    add(new Pixel(-2, 2, Color.WHITE));
-                    add(new Pixel(-1, -2, Color.WHITE));
-                    add(new Pixel(-1, 0, Color.WHITE));
-                    add(new Pixel(0, -2, Color.WHITE));
-                    add(new Pixel(0, 0, Color.WHITE));
-                    add(new Pixel(1, -2, Color.WHITE));
-                    add(new Pixel(1, 0, Color.WHITE));
-                    add(new Pixel(2, -1, Color.WHITE));
-                    add(new Pixel(2, 0, Color.WHITE));
-                    add(new Pixel(2, 1, Color.WHITE));
-                    add(new Pixel(2, 2, Color.WHITE));
+                    add(new int[] { -2, -1 });
+                    add(new int[] { -2, 0 });
+                    add(new int[] { -2, 1 });
+                    add(new int[] { -2, 2 });
+                    add(new int[] { -1, -2 });
+                    add(new int[] { -1, 0 });
+                    add(new int[] { 0, -2 });
+                    add(new int[] { 0, 0 });
+                    add(new int[] { 1, -2 });
+                    add(new int[] { 1, 0 });
+                    add(new int[] { 2, -1 });
+                    add(new int[] { 2, 0 });
+                    add(new int[] { 2, 1 });
+                    add(new int[] { 2, 2 });
                 }
             });
-            put("G", new ArrayList<Pixel>() {
+            put("G", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-2, -1, Color.WHITE));
-                    add(new Pixel(-2, 0, Color.WHITE));
-                    add(new Pixel(-2, 1, Color.WHITE));
-                    add(new Pixel(-1, -2, Color.WHITE));
-                    add(new Pixel(-1, 2, Color.WHITE));
-                    add(new Pixel(0, -2, Color.WHITE));
-                    add(new Pixel(0, 2, Color.WHITE));
-                    add(new Pixel(1, -2, Color.WHITE));
-                    add(new Pixel(1, 0, Color.WHITE));
-                    add(new Pixel(1, 2, Color.WHITE));
-                    add(new Pixel(2, -2, Color.WHITE));
-                    add(new Pixel(2, 0, Color.WHITE));
-                    add(new Pixel(2, 1, Color.WHITE));
-                    add(new Pixel(2, 2, Color.WHITE));
+                    add(new int[] { -2, -1 });
+                    add(new int[] { -2, 0 });
+                    add(new int[] { -2, 1 });
+                    add(new int[] { -1, -2 });
+                    add(new int[] { -1, 2 });
+                    add(new int[] { 0, -2 });
+                    add(new int[] { 0, 2 });
+                    add(new int[] { 1, -2 });
+                    add(new int[] { 1, 0 });
+                    add(new int[] { 1, 2 });
+                    add(new int[] { 2, -2 });
+                    add(new int[] { 2, 0 });
+                    add(new int[] { 2, 1 });
+                    add(new int[] { 2, 2 });
                 }
             });
-            put("Block", new ArrayList<Pixel>() {
+            put("Block", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(0, 0, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(1, 0, Color.WHITE));
-                    add(new Pixel(1, 1, Color.WHITE));
+                    add(new int[] { 0, 0 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 1, 0 });
+                    add(new int[] { 1, 1 });
                 }
             });
 
-            put("Bee-hive ", new ArrayList<Pixel>() {
+            put("Bee-hive ", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-1, 0, Color.WHITE));
-                    add(new Pixel(0, -1, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(1, -1, Color.WHITE));
-                    add(new Pixel(1, 1, Color.WHITE));
-                    add(new Pixel(2, 0, Color.WHITE));
+                    add(new int[] { -1, 0 });
+                    add(new int[] { 0, -1 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 1, -1 });
+                    add(new int[] { 1, 1 });
+                    add(new int[] { 2, 0 });
                 }
             });
-            put("Loaf", new ArrayList<Pixel>() {
+            put("Loaf", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-1, 0, Color.WHITE));
-                    add(new Pixel(0, -1, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(1, -1, Color.WHITE));
-                    add(new Pixel(1, 2, Color.WHITE));
-                    add(new Pixel(2, 0, Color.WHITE));
-                    add(new Pixel(2, 1, Color.WHITE));
+                    add(new int[] { -1, 0 });
+                    add(new int[] { 0, -1 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 1, -1 });
+                    add(new int[] { 1, 2 });
+                    add(new int[] { 2, 0 });
+                    add(new int[] { 2, 1 });
                 }
             });
-            put("Boat", new ArrayList<Pixel>() {
+            put("Boat", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-1, -1, Color.WHITE));
-                    add(new Pixel(-1, 0, Color.WHITE));
-                    add(new Pixel(0, -1, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(1, 0, Color.WHITE));
+                    add(new int[] { -1, -1 });
+                    add(new int[] { -1, 0 });
+                    add(new int[] { 0, -1 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 1, 0 });
                 }
             });
-            put("Tub", new ArrayList<Pixel>() {
+            put("Tub", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-1, 0, Color.WHITE));
-                    add(new Pixel(0, -1, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(1, 0, Color.WHITE));
+                    add(new int[] { -1, 0 });
+                    add(new int[] { 0, -1 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 1, 0 });
                 }
             });
-            put("Blinker", new ArrayList<Pixel>() {
+            put("Blinker", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(0, -1, Color.WHITE));
-                    add(new Pixel(0, 0, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
+                    add(new int[] { 0, -1 });
+                    add(new int[] { 0, 0 });
+                    add(new int[] { 0, 1 });
                 }
             });
-            put("Toad", new ArrayList<Pixel>() {
+            put("Toad", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-1, 1, Color.WHITE));
-                    add(new Pixel(0, 0, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(1, 0, Color.WHITE));
-                    add(new Pixel(1, 1, Color.WHITE));
-                    add(new Pixel(2, 0, Color.WHITE));
+                    add(new int[] { -1, 1 });
+                    add(new int[] { 0, 0 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 1, 0 });
+                    add(new int[] { 1, 1 });
+                    add(new int[] { 2, 0 });
                 }
             });
-            put("Beacon", new ArrayList<Pixel>() {
+            put("Beacon", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-1, -1, Color.WHITE));
-                    add(new Pixel(-1, 0, Color.WHITE));
-                    add(new Pixel(0, -1, Color.WHITE));
-                    add(new Pixel(0, 0, Color.WHITE));
-                    add(new Pixel(1, 1, Color.WHITE));
-                    add(new Pixel(1, 2, Color.WHITE));
-                    add(new Pixel(2, 1, Color.WHITE));
-                    add(new Pixel(2, 2, Color.WHITE));
+                    add(new int[] { -1, -1 });
+                    add(new int[] { -1, 0 });
+                    add(new int[] { 0, -1 });
+                    add(new int[] { 0, 0 });
+                    add(new int[] { 1, 1 });
+                    add(new int[] { 1, 2 });
+                    add(new int[] { 2, 1 });
+                    add(new int[] { 2, 2 });
                 }
             });
-            put("Pulsar", new ArrayList<Pixel>() {
+            put("Pulsar", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-6, -4, Color.WHITE));
-                    add(new Pixel(-6, -3, Color.WHITE));
-                    add(new Pixel(-6, -2, Color.WHITE));
-                    add(new Pixel(-6, 2, Color.WHITE));
-                    add(new Pixel(-6, 3, Color.WHITE));
-                    add(new Pixel(-6, 4, Color.WHITE));
-                    add(new Pixel(-4, -6, Color.WHITE));
-                    add(new Pixel(-4, -1, Color.WHITE));
-                    add(new Pixel(-4, 1, Color.WHITE));
-                    add(new Pixel(-4, 6, Color.WHITE));
-                    add(new Pixel(-3, -6, Color.WHITE));
-                    add(new Pixel(-3, -1, Color.WHITE));
-                    add(new Pixel(-3, 1, Color.WHITE));
-                    add(new Pixel(-3, 6, Color.WHITE));
-                    add(new Pixel(-2, -6, Color.WHITE));
-                    add(new Pixel(-2, -1, Color.WHITE));
-                    add(new Pixel(-2, 1, Color.WHITE));
-                    add(new Pixel(-2, 6, Color.WHITE));
-                    add(new Pixel(-1, -4, Color.WHITE));
-                    add(new Pixel(-1, -3, Color.WHITE));
-                    add(new Pixel(-1, -2, Color.WHITE));
-                    add(new Pixel(-1, 2, Color.WHITE));
-                    add(new Pixel(-1, 3, Color.WHITE));
-                    add(new Pixel(-1, 4, Color.WHITE));
-                    add(new Pixel(1, -4, Color.WHITE));
-                    add(new Pixel(1, -3, Color.WHITE));
-                    add(new Pixel(1, -2, Color.WHITE));
-                    add(new Pixel(1, 2, Color.WHITE));
-                    add(new Pixel(1, 3, Color.WHITE));
-                    add(new Pixel(1, 4, Color.WHITE));
-                    add(new Pixel(2, -6, Color.WHITE));
-                    add(new Pixel(2, -1, Color.WHITE));
-                    add(new Pixel(2, 1, Color.WHITE));
-                    add(new Pixel(2, 6, Color.WHITE));
-                    add(new Pixel(3, -6, Color.WHITE));
-                    add(new Pixel(3, -1, Color.WHITE));
-                    add(new Pixel(3, 1, Color.WHITE));
-                    add(new Pixel(3, 6, Color.WHITE));
-                    add(new Pixel(4, -6, Color.WHITE));
-                    add(new Pixel(4, -1, Color.WHITE));
-                    add(new Pixel(4, 1, Color.WHITE));
-                    add(new Pixel(4, 6, Color.WHITE));
-                    add(new Pixel(6, -4, Color.WHITE));
-                    add(new Pixel(6, -3, Color.WHITE));
-                    add(new Pixel(6, -2, Color.WHITE));
-                    add(new Pixel(6, 2, Color.WHITE));
-                    add(new Pixel(6, 3, Color.WHITE));
-                    add(new Pixel(6, 4, Color.WHITE));
+                    add(new int[] { -6, -4 });
+                    add(new int[] { -6, -3 });
+                    add(new int[] { -6, -2 });
+                    add(new int[] { -6, 2 });
+                    add(new int[] { -6, 3 });
+                    add(new int[] { -6, 4 });
+                    add(new int[] { -4, -6 });
+                    add(new int[] { -4, -1 });
+                    add(new int[] { -4, 1 });
+                    add(new int[] { -4, 6 });
+                    add(new int[] { -3, -6 });
+                    add(new int[] { -3, -1 });
+                    add(new int[] { -3, 1 });
+                    add(new int[] { -3, 6 });
+                    add(new int[] { -2, -6 });
+                    add(new int[] { -2, -1 });
+                    add(new int[] { -2, 1 });
+                    add(new int[] { -2, 6 });
+                    add(new int[] { -1, -4 });
+                    add(new int[] { -1, -3 });
+                    add(new int[] { -1, -2 });
+                    add(new int[] { -1, 2 });
+                    add(new int[] { -1, 3 });
+                    add(new int[] { -1, 4 });
+                    add(new int[] { 1, -4 });
+                    add(new int[] { 1, -3 });
+                    add(new int[] { 1, -2 });
+                    add(new int[] { 1, 2 });
+                    add(new int[] { 1, 3 });
+                    add(new int[] { 1, 4 });
+                    add(new int[] { 2, -6 });
+                    add(new int[] { 2, -1 });
+                    add(new int[] { 2, 1 });
+                    add(new int[] { 2, 6 });
+                    add(new int[] { 3, -6 });
+                    add(new int[] { 3, -1 });
+                    add(new int[] { 3, 1 });
+                    add(new int[] { 3, 6 });
+                    add(new int[] { 4, -6 });
+                    add(new int[] { 4, -1 });
+                    add(new int[] { 4, 1 });
+                    add(new int[] { 4, 6 });
+                    add(new int[] { 6, -4 });
+                    add(new int[] { 6, -3 });
+                    add(new int[] { 6, -2 });
+                    add(new int[] { 6, 2 });
+                    add(new int[] { 6, 3 });
+                    add(new int[] { 6, 4 });
                 }
             });
-            put("Penta-decathlon", new ArrayList<Pixel>() {
+            put("Penta-decathlon", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-1, -3, Color.WHITE));
-                    add(new Pixel(-1, -2, Color.WHITE));
-                    add(new Pixel(-1, -1, Color.WHITE));
-                    add(new Pixel(-1, 0, Color.WHITE));
-                    add(new Pixel(-1, 1, Color.WHITE));
-                    add(new Pixel(-1, 2, Color.WHITE));
-                    add(new Pixel(-1, 3, Color.WHITE));
-                    add(new Pixel(-1, 4, Color.WHITE));
-                    add(new Pixel(0, -3, Color.WHITE));
-                    add(new Pixel(0, -1, Color.WHITE));
-                    add(new Pixel(0, 0, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(0, 2, Color.WHITE));
-                    add(new Pixel(0, 4, Color.WHITE));
-                    add(new Pixel(1, -3, Color.WHITE));
-                    add(new Pixel(1, -2, Color.WHITE));
-                    add(new Pixel(1, -1, Color.WHITE));
-                    add(new Pixel(1, 0, Color.WHITE));
-                    add(new Pixel(1, 1, Color.WHITE));
-                    add(new Pixel(1, 2, Color.WHITE));
-                    add(new Pixel(1, 3, Color.WHITE));
-                    add(new Pixel(1, 4, Color.WHITE));
+                    add(new int[] { -1, -3 });
+                    add(new int[] { -1, -2 });
+                    add(new int[] { -1, -1 });
+                    add(new int[] { -1, 0 });
+                    add(new int[] { -1, 1 });
+                    add(new int[] { -1, 2 });
+                    add(new int[] { -1, 3 });
+                    add(new int[] { -1, 4 });
+                    add(new int[] { 0, -3 });
+                    add(new int[] { 0, -1 });
+                    add(new int[] { 0, 0 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 0, 2 });
+                    add(new int[] { 0, 4 });
+                    add(new int[] { 1, -3 });
+                    add(new int[] { 1, -2 });
+                    add(new int[] { 1, -1 });
+                    add(new int[] { 1, 0 });
+                    add(new int[] { 1, 1 });
+                    add(new int[] { 1, 2 });
+                    add(new int[] { 1, 3 });
+                    add(new int[] { 1, 4 });
                 }
             });
-            put("Glider", new ArrayList<Pixel>() {
+            put("Glider", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-1, 1, Color.WHITE));
-                    add(new Pixel(0, -1, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(1, 0, Color.WHITE));
-                    add(new Pixel(1, 1, Color.WHITE));
+                    add(new int[] { -1, 1 });
+                    add(new int[] { 0, -1 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 1, 0 });
+                    add(new int[] { 1, 1 });
                 }
             });
-            put("Light-weight spaceship (LWSS) ", new ArrayList<Pixel>() {
+            put("Light-weight spaceship (LWSS) ", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-2, 0, Color.WHITE));
-                    add(new Pixel(-2, 1, Color.WHITE));
-                    add(new Pixel(-1, 0, Color.WHITE));
-                    add(new Pixel(-1, 1, Color.WHITE));
-                    add(new Pixel(-1, 2, Color.WHITE));
-                    add(new Pixel(0, -1, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(0, 2, Color.WHITE));
-                    add(new Pixel(1, -1, Color.WHITE));
-                    add(new Pixel(1, 0, Color.WHITE));
-                    add(new Pixel(1, 1, Color.WHITE));
-                    add(new Pixel(2, 0, Color.WHITE));
+                    add(new int[] { -2, 0 });
+                    add(new int[] { -2, 1 });
+                    add(new int[] { -1, 0 });
+                    add(new int[] { -1, 1 });
+                    add(new int[] { -1, 2 });
+                    add(new int[] { 0, -1 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 0, 2 });
+                    add(new int[] { 1, -1 });
+                    add(new int[] { 1, 0 });
+                    add(new int[] { 1, 1 });
+                    add(new int[] { 2, 0 });
                 }
             });
-            put("Middle-weight spaceship (MWSS) ", new ArrayList<Pixel>() {
+            put("Middle-weight spaceship (MWSS) ", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-2, 0, Color.WHITE));
-                    add(new Pixel(-2, 1, Color.WHITE));
-                    add(new Pixel(-1, 0, Color.WHITE));
-                    add(new Pixel(-1, 1, Color.WHITE));
-                    add(new Pixel(-1, 2, Color.WHITE));
-                    add(new Pixel(0, 0, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(0, 2, Color.WHITE));
-                    add(new Pixel(1, -1, Color.WHITE));
-                    add(new Pixel(1, 1, Color.WHITE));
-                    add(new Pixel(1, 2, Color.WHITE));
-                    add(new Pixel(2, -1, Color.WHITE));
-                    add(new Pixel(2, 0, Color.WHITE));
-                    add(new Pixel(2, 1, Color.WHITE));
-                    add(new Pixel(3, 0, Color.WHITE));
+                    add(new int[] { -2, 0 });
+                    add(new int[] { -2, 1 });
+                    add(new int[] { -1, 0 });
+                    add(new int[] { -1, 1 });
+                    add(new int[] { -1, 2 });
+                    add(new int[] { 0, 0 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 0, 2 });
+                    add(new int[] { 1, -1 });
+                    add(new int[] { 1, 1 });
+                    add(new int[] { 1, 2 });
+                    add(new int[] { 2, -1 });
+                    add(new int[] { 2, 0 });
+                    add(new int[] { 2, 1 });
+                    add(new int[] { 3, 0 });
                 }
             });
-            put("Heavy-weight spaceship (HWSS)", new ArrayList<Pixel>() {
+            put("Heavy-weight spaceship (HWSS)", new ArrayList<int[]>() {
                 {
-                    add(new Pixel(-3, 0, Color.WHITE));
-                    add(new Pixel(-3, 1, Color.WHITE));
-                    add(new Pixel(-2, 0, Color.WHITE));
-                    add(new Pixel(-2, 1, Color.WHITE));
-                    add(new Pixel(-2, 2, Color.WHITE));
-                    add(new Pixel(-1, 0, Color.WHITE));
-                    add(new Pixel(-1, 1, Color.WHITE));
-                    add(new Pixel(-1, 2, Color.WHITE));
-                    add(new Pixel(0, 0, Color.WHITE));
-                    add(new Pixel(0, 1, Color.WHITE));
-                    add(new Pixel(0, 2, Color.WHITE));
-                    add(new Pixel(1, -1, Color.WHITE));
-                    add(new Pixel(1, 1, Color.WHITE));
-                    add(new Pixel(1, 2, Color.WHITE));
-                    add(new Pixel(2, -1, Color.WHITE));
-                    add(new Pixel(2, 0, Color.WHITE));
-                    add(new Pixel(2, 1, Color.WHITE));
-                    add(new Pixel(3, 0, Color.WHITE));
+                    add(new int[] { -3, 0 });
+                    add(new int[] { -3, 1 });
+                    add(new int[] { -2, 0 });
+                    add(new int[] { -2, 1 });
+                    add(new int[] { -2, 2 });
+                    add(new int[] { -1, 0 });
+                    add(new int[] { -1, 1 });
+                    add(new int[] { -1, 2 });
+                    add(new int[] { 0, 0 });
+                    add(new int[] { 0, 1 });
+                    add(new int[] { 0, 2 });
+                    add(new int[] { 1, -1 });
+                    add(new int[] { 1, 1 });
+                    add(new int[] { 1, 2 });
+                    add(new int[] { 2, -1 });
+                    add(new int[] { 2, 0 });
+                    add(new int[] { 2, 1 });
+                    add(new int[] { 3, 0 });
                 }
             });
 

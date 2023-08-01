@@ -214,7 +214,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                         int[] bound = findBoundaries(patternToAdd);
                                         transformPattern(patternToAdd, bound);
                                 } else {
-                                        ArrayList<Pixel> pattern = GameOfLife.predefinedPatterns.get(selectedItem);
+                                        ArrayList<int[]> pattern = GameOfLife.predefinedPatterns.get(selectedItem);
                                         canvas.setSelectedPattern(pattern);
                                 }
                         }
@@ -421,7 +421,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                 for (Pixel pixel : pixels) {
                         int newPixelX = (pixel.getX() - measurements[0]) - (measurements[2] / 2);
                         int newPixelY = (pixel.getY() - measurements[1]) - (measurements[3] / 2);
-                        System.out.println("add(new Pixel(" + newPixelX + "," + newPixelY + "," + " Color.WHITE));");
+                        System.out.println("add(new int[] { " + newPixelX + "," + newPixelY + "});");
                 }
                 System.out.println(
                                 "Copy these into GameOfLife predefined patterns following the syntax already available.");
