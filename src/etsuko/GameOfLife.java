@@ -383,22 +383,23 @@ public class GameOfLife {
 
     private int getAliveNeighbours(Pixel cell) {
         int alive_neighbours = 0;
-        for (Pixel alive_cell : alive_cells) {
-            if (alive_cell != cell) {
-                if (isNeighbour(cell, alive_cell)) {
-                    alive_neighbours++;
+        int currX = cell.getX();
+        int currY = cell.getY();
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                int tmpX = currX + x;
+                int tmpY = currY + y;
+                try {
+                    Pixel currCell = canvas.getPixel(tmpX, tmpY);
+                    if (!currCell.equals(cell) && alive_cells.contains(currCell)) {
+                        alive_neighbours++;
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    continue;
                 }
             }
         }
         return alive_neighbours;
-    }
-
-    private boolean isNeighbour(Pixel cell1, Pixel cell2) {
-        int x1 = cell1.getX();
-        int y1 = cell1.getY();
-        int x2 = cell2.getX();
-        int y2 = cell2.getY();
-        return (x1 == x2 || x1 == x2 - 1 || x1 == x2 + 1) && (y1 == y2 || y1 == y2 - 1 || y1 == y2 + 1);
     }
 
     public boolean canStop() {
