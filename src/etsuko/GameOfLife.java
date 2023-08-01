@@ -9,8 +9,6 @@ public class GameOfLife {
     private ArrayList<Pixel> alive_cells;
     private PixelPanel canvas;
     private static long iteration = 0;
-    private static int canvas_width;
-    private static int canvas_height;
     private boolean canStop = false;
     public static final HashMap<String, ArrayList<int[]>> predefinedPatterns = new HashMap<String, ArrayList<int[]>>() {
         {
@@ -315,8 +313,6 @@ public class GameOfLife {
 
     GameOfLife(PixelPanel canvas) {
         this.canvas = canvas;
-        canvas_width = canvas.getCanvasSize().width;
-        canvas_height = canvas.getCanvasSize().height;
         initAliveCells();
         canStop = false;
     }
@@ -327,34 +323,49 @@ public class GameOfLife {
 
     public void applyRules() {
         ArrayList<Pixel> new_alive_cells = new ArrayList<Pixel>();
-        for (int x = 0; x < canvas_width; x++) {
-            for (int y = 0; y < canvas_height; y++) {
-                Pixel cell = canvas.getPixel(x, y);
-                boolean is_alive = alive_cells.contains(cell);
-                int alive_neighbours = getAliveNeighbours(cell);
-                if (is_alive) {
-                    // Any live cell with two or three live neighbours lives on to the next
-                    // generation
-                    if (alive_neighbours == 2 || alive_neighbours == 3) {
-                        new_alive_cells.add(cell);
-                    }
-                    // Any live cell with fewer than two live neighbours dies, as if by
-                    // underpopulation
-                    // Any live cell with more than three live neighbours dies, as if by
-                    // overpopulation.
-                    else {
-                        cell.setColor(canvas.getBack());
-                    }
-                } else {
-                    // Any dead cell with exactly three live neighbours becomes a live cell, as if
-                    // by reproduction.
-                    if (alive_neighbours == 3) {
-                        cell.setColor(canvas.getSelectedColor());
-                        new_alive_cells.add(cell);
+        ArrayList<Pixel> checkedCells = new ArrayList<Pixel>();
 
+        for (Pixel cell : alive_cells) {
+            int currX = cell.getX();
+            int currY = cell.getY();
+            // check the cell and it's neighbours.
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    int tmpX = currX + x;
+                    int tmpY = currY + y;
+                    try {
+                        Pixel neighboorCell = canvas.getPixel(tmpX, tmpY);
+                        if (new_alive_cells.contains(neighboorCell) || checkedCells.contains(neighboorCell)) {
+                            continue;
+                        }
+                        checkedCells.add(neighboorCell);
+                        boolean alive = alive_cells.contains(neighboorCell);
+                        int alive_neighbours = getAliveNeighbours(neighboorCell);
+                        if (alive) {
+                            // Any live cell with two or three live neighbours lives on to the next
+                            // generation
+                            if (alive_neighbours == 2 || alive_neighbours == 3) {
+                                new_alive_cells.add(neighboorCell);
+                            }
+                            // Any live cell with fewer than two live neighbours dies, as if by
+                            // underpopulation
+                            // Any live cell with more than three live neighbours dies, as if by
+                            // overpopulation.
+                            else {
+                                neighboorCell.setColor(canvas.getBack());
+                            }
+                        } else {
+                            // Any dead cell with exactly three live neighbours becomes a live cell, as
+                            // if by reproduction.
+                            if (alive_neighbours == 3) {
+                                neighboorCell.setColor(canvas.getSelectedColor());
+                                new_alive_cells.add(neighboorCell);
+                            }
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        continue;
                     }
                 }
-
             }
         }
         alive_cells = new_alive_cells;
