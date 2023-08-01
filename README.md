@@ -1,6 +1,5 @@
 # Game of Life
 - This is a java implementation of Conway's Game of Life.
-- currently it lacks optimization.
 
 ## Usage
 - Download the Jar file from the releases and run it with `java -jar game-of-life-java.jar`
