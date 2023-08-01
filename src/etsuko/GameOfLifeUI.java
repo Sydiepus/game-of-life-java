@@ -119,7 +119,7 @@ public class GameOfLifeUI extends JPanel implements ActionListener {
                                         // change Alive color to c8ded2
                                         Color etsukoAlive = new Color(200, 222, 210);
                                         Color etsukoDead = new Color(0, 3, 7);
-                                        Color etsukoGrid = new Color(49, 88, 75);
+                                        Color etsukoGrid = new Color(63, 104, 106);
                                         alive_color_picker.setBackground(etsukoAlive);
                                         alive_color_picker.setEnabled(false);
                                         canvas.setSelectedColor(etsukoAlive);
